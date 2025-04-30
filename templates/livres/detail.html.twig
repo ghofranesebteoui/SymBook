@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello LivresController!{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Détail du Livre</h1>
+    <div class="card">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ livre.image }}" alt="Image du livre" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; margin: 20px;">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ livre.titre }}</h5>
+                    <p class="card-text"><strong>Éditeur :</strong> {{ livre.editeur }}</p>
+                    <p class="card-text"><strong>Date d'édition :</strong> {{ livre.dateEdition|date('d/m/Y') }}</p>
+                    <p class="card-text"><strong>Resume:</strong> {{ livre.resume }}</p>
+                    <p class="card-text"><strong>Prix :</strong> {{ livre.prix }} DT</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

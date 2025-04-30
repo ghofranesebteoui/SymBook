@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello LivresController!{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Liste des livres</h1>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Image</th>
+            <th>Titre</th>
+            <th>Editeur</th>
+            <th>Date Edition</th>
+            <th>Prix</th>
+            <th>Categorie</th>
+            <th>Action</th>
+            <th>Action</th>
+            <th>Ajout prix</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for livre in livres %}
+            <tr>
+                <td><img src="{{ livre.image }}" alt="Image du livre" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                </td>
+                <td>{{ livre.titre }}</td>
+                <td>{{ livre.editeur }}</td>
+                <td>{{ livre.dateEdition|date('d/m/Y')  }}</td>
+                <td>{{ livre.prix }}DT</td>
+                {% if livre.categorie %}
+                    <td>{{ livre.categorie.libelle }}</td>
+                {% else %}
+                    <td>Pas de catégorie</td>
+                {% endif %}
+
+                <td><a href="{{ path('app_livres_show', {'id': livre.id}) }}">Voir détail</a></td>
+                <td><a href="{{ path('app_livres_delete', {'id': livre.id}) }}">Supprimer</a></td>
+                <td><a href="{{ path('app_livres_update', {'id': livre.id}) }}">Augmenter prix</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="navigation">
+        {{ knp_pagination_render(livres) }}
+    </div>
+</div>
+
+{% endblock %}
