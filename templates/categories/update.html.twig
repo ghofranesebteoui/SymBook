@@ -1,8 +1,10 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello CategoriesController!{% endblock %}
+{% extends '../base.html.twig' %}
 
 {% block body %}
-    <h1>Mis à jour d'une Categorie</h1>
-    {{ form(form) }}
+    <h1>Modifier une Catégorie</h1>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary">Modifier</button>
+    {{ form_end(form) }}
+    <a href="{{ path('app_categories_all') }}" class="btn btn-secondary mt-2">Annuler</a>
 {% endblock %}

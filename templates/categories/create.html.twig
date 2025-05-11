@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CategoriesController!{% endblock %}
-
 {% block body %}
-    <h1>Ajout d'une nouvelle Categorie</h1>
-    {{ form(form) }}
+    <h1>Ajouter une Catégorie</h1>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+    {{ form_end(form) }}
+    <a href="{{ path('app_categories_all') }}" class="btn btn-secondary mt-2">Annuler</a>
 {% endblock %}

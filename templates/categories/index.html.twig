@@ -1,16 +1,34 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CategoriesController!{% endblock %}
-
 {% block body %}
-    <h1>Liste des Categories</h1>
-    <div class="d-flex justify-content-end">
-    <a href="create.html.twig" class="btn btn-primary">Ajouter une categorie</a>
-    </div>
-    <ul>
-        {% for cat in categories %}
-            <li>{{ cat.libelle }}</li>
+    <h1>Liste des Catégories</h1>
+    <a href="{{ path('app_categories_create') }}" class="btn btn-primary mb-3">Ajouter une Catégorie</a>
 
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Libellé</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for category in categories %}
+            <tr>
+                <td>{{ category.id }}</td>
+                <td>{{ category.libelle }}</td>
+                <td>
+                    <a href="{{ path('app_categories_update', {'id': category.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                    <a href="{{ path('app_categories_delete', {'id': category.id}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr ?')">Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="3">Aucune catégorie trouvée.</td></tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
+
+    <div class="navigation">
+        {{ knp_pagination_render(categories) }}
+    </div>
 {% endblock %}

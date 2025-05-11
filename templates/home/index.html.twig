@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <div class="bg-light text-center py-5 mb-4">
+        <h1 class="display-4 text-primary">Bienvenue sur Symbook</h1>
+        <p class="lead">Découvrez une vaste collection de livres et plongez dans la lecture !</p>
+        <a href="{{ path('app_livres_index') }}" class="btn btn-success btn-lg">Explorer le Catalogue</a>
+        {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+            <a href="{{ path('app_login') }}" class="btn btn-outline-primary btn-lg ms-2">Connexion</a>
+        {% endif %}
+    </div>
+
+    <!-- Featured Books Section -->
+    <div class="container">
+        <h2 class="mb-4">Livres en Vedette</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for livre in livres %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ livre.image ? livre.image : 'https://via.placeholder.com/150' }}" class="card-img-top" alt="{{ livre.titre }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ livre.titre }}</h5>
+                            <p class="card-text">{{ livre.resume|slice(0, 100) ~ '...' }}</p>
+                            <p class="text-muted">Prix: {{ livre.prix }} €</p>
+                            <a href="{{ path('app_livres_index') }}" class="btn btn-primary">Voir Plus</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">Aucun livre disponible pour le moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
