@@ -1,4 +1,3 @@
-
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
@@ -22,7 +21,6 @@ security:
                 path: app_logout
                 # where to redirect after logout
                 target: app_login
-
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
@@ -40,9 +38,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-         - { path: ^/admin, roles: ROLE_ADMIN }
-         - { path: ^/etudiant, roles: ROLE_ETUDIANT }
-
+        # Allow anonymous access to the homepage and login/register routes
+        #- { path: ^/$, roles: PUBLIC_ACCESS }
+        #- { path: ^/login$, roles: PUBLIC_ACCESS }
+        #- { path: ^/register$, roles: PUBLIC_ACCESS }
+       # - { path: ^/admin, roles: ROLE_ADMIN }
 when@test:
     security:
         password_hashers:

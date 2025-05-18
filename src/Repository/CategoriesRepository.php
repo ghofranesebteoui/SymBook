@@ -40,4 +40,25 @@ class CategoriesRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function create(Request $request, EntityManagerInterface $em, CategorieRepository $categorieRepo): Response
+    {
+        $livre = new Livres();
+        $form = $this->createForm(LivresType::class, $livre);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($livre);
+            $em->flush();
+            $this->addFlash('success', 'Le livre a été bien ajouté');
+            return $this->redirectToRoute('app_livres_all');
+        }
+
+        $categories = $categorieRepo->findAll(); // récupération des catégories
+
+        return $this->render('livres/create.html.twig', [
+            'form' => $form,
+            'categories' => $categories, // transmission à Twig
+        ]);
+    }
+
 }

@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\LivresRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LivresRepository::class)]
 class Livres
@@ -40,6 +42,37 @@ class Livres
 
     #[ORM\ManyToOne(inversedBy: 'livres')]
     private ?Categories $categorie = null;
+    #[ORM\OneToMany(mappedBy: 'livre', targetEntity: CommandeLivres::class)]
+    private Collection $commandeLivres;
+
+    public function __construct()
+    {
+        $this->commandeLivres = new ArrayCollection();
+    }
+
+    public function getCommandeLivres(): Collection
+    {
+        return $this->commandeLivres;
+    }
+
+    public function addCommandeLivre(CommandeLivres $commandeLivre): static
+    {
+        if (!$this->commandeLivres->contains($commandeLivre)) {
+            $this->commandeLivres->add($commandeLivre);
+            $commandeLivre->setLivre($this);
+        }
+        return $this;
+    }
+
+    public function removeCommandeLivre(CommandeLivres $commandeLivre): static
+    {
+        if ($this->commandeLivres->removeElement($commandeLivre)) {
+            if ($commandeLivre->getLivre() === $this) {
+                $commandeLivre->setLivre(null);
+            }
+        }
+        return $this;
+    }
 
     public function getId(): ?int
     {
