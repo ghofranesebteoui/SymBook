@@ -14,7 +14,7 @@
                 {% endif %}
             </div>
             <div class="col-md-8">
-                <p><strong>Auteur:</strong> {{ livre.auteur }}</p>
+                <p><strong>Auteur:</strong> {{ livre.editeur }}</p>
                 <p><strong>Catégorie:</strong> {{ livre.categorie ? livre.categorie.libelle : 'Non renseignée' }}</p>
                 <p><strong>Prix:</strong> {{ livre.prix|number_format(2) }} €</p>
                 <p><strong>Éditeur:</strong> {{ livre.editeur }}</p>

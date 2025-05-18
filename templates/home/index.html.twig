@@ -5,7 +5,7 @@
     <div class="bg-light text-center py-5 mb-4">
         <h1 class="display-4 text-primary">Bienvenue sur Symbook</h1>
         <p class="lead">Découvrez une vaste collection de livres et plongez dans la lecture !</p>
-        <a href="{{ path('app_livres_index') }}" class="btn btn-success btn-lg">Explorer le Catalogue</a>
+        <a href="{{ path('app_livres_all') }}" class="btn btn-success btn-lg">Explorer le Catalogue</a>
         {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
             <a href="{{ path('app_login') }}" class="btn btn-outline-primary btn-lg ms-2">Connexion</a>
         {% endif %}
@@ -23,7 +23,7 @@
                             <h5 class="card-title">{{ livre.titre }}</h5>
                             <p class="card-text">{{ livre.resume|slice(0, 100) ~ '...' }}</p>
                             <p class="text-muted">Prix: {{ livre.prix }} €</p>
-                            <a href="{{ path('app_livres_index') }}" class="btn btn-primary">Voir Plus</a>
+                            <a href="{{ path('app_livres_all') }}" class="btn btn-primary">Voir Plus</a>
                         </div>
                     </div>
                 </div>

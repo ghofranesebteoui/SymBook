@@ -20,7 +20,7 @@ class Livres
     private ?string $titre = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $auteur = null;
+    private ?string $editeur = null;
 
     #[ORM\Column(length: 255)]
     private ?string $isbn = null;
@@ -34,8 +34,6 @@ class Livres
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $resume = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $editeur = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateEdition = null;
@@ -77,13 +75,6 @@ class Livres
         return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: 'livre', targetEntity: CommandeLivres::class)]
-    private Collection $commandeLivres;
-
-    public function __construct()
-    {
-        $this->commandeLivres = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -101,14 +92,14 @@ class Livres
         return $this;
     }
 
-    public function getAuteur(): ?string
+    public function getEditeur(): ?string
     {
-        return $this->auteur;
+        return $this->editeur;
     }
 
-    public function setAuteur(string $auteur): static
+    public function setEditeur(string $editeur): static
     {
-        $this->auteur = $auteur;
+        $this->editeur = $editeur;
         return $this;
     }
 
@@ -156,16 +147,7 @@ class Livres
         return $this;
     }
 
-    public function getEditeur(): ?string
-    {
-        return $this->editeur;
-    }
 
-    public function setEditeur(string $editeur): static
-    {
-        $this->editeur = $editeur;
-        return $this;
-    }
 
     public function getDateEdition(): ?\DateTimeInterface
     {
@@ -200,27 +182,4 @@ class Livres
         return $this;
     }
 
-    public function getCommandeLivres(): Collection
-    {
-        return $this->commandeLivres;
-    }
-
-    public function addCommandeLivre(CommandeLivres $commandeLivre): static
-    {
-        if (!$this->commandeLivres->contains($commandeLivre)) {
-            $this->commandeLivres->add($commandeLivre);
-            $commandeLivre->setLivre($this);
-        }
-        return $this;
-    }
-
-    public function removeCommandeLivre(CommandeLivres $commandeLivre): static
-    {
-        if ($this->commandeLivres->removeElement($commandeLivre)) {
-            if ($commandeLivre->getLivre() === $this) {
-                $commandeLivre->setLivre(null);
-            }
-        }
-        return $this;
-    }
 }
