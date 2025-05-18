@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Bienvenue sur votre interface utilisateur</h1>
+    <p>Explorez nos livres et gérez vos commandes.</p>
+
+    <div class="row">
+        {% for livre in livres %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{ livre.image }}" class="card-img-top" alt="{{ livre.titre }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ livre.titre }}</h5>
+                        <p class="card-text">{{ livre.resume|slice(0, 100) }}...</p>
+                        <p><strong>Prix:</strong> {{ livre.prix }} €</p>
+                        <p><strong>Catégorie:</strong> {{ livre.categorie ? livre.categorie.libelle : 'Non renseignée' }}</p>
+                        <a href="{{ path('app_user_book_details', {'id': livre.id}) }}" class="btn btn-primary">Voir détails</a>
+                        <a href="{{ path('app_user_add_to_cart', {'id': livre.id}) }}" class="btn btn-success">Ajouter au panier</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <p>Aucun livre disponible.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

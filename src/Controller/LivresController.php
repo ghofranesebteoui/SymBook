@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Livres;
-use App\Entity\Categories; // Add this import
 use App\Form\LivresType;
 use App\Repository\LivresRepository;
-use App\Repository\CategoriesRepository; // Add this import
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,53 +17,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 final class LivresController extends AbstractController
 {
-    private $categoriesRepository;
-
-    public function __construct(CategoriesRepository $categoriesRepository)
-    {
-        $this->categoriesRepository = $categoriesRepository;
-    }
-
     #[Route('/livres', name: 'app_livres_all')]
-    public function all(Request $request, PaginatorInterface $paginator, EntityManagerInterface $entityManager): Response
+    public function all(LivresRepository $rep, PaginatorInterface $paginator, Request $request): Response
     {
-        // Récupérer le paramètre de recherche
-        $search = $request->query->get('search');
-
-        // Créer la requête de base
-        $queryBuilder = $entityManager->getRepository(Livres::class)->createQueryBuilder('l');
-
-        // Si un terme de recherche est fourni, filtrer par titre
-        if ($search) {
-            $queryBuilder
-                ->where('l.titre LIKE :search')
-                ->setParameter('search', '%' . $search . '%')
-                ->orderBy('l.titre', 'ASC');
-        } else {
-            // Si pas de recherche, trier par ID décroissant (ou autre critère)
-            $queryBuilder->orderBy('l.id', 'DESC');
-        }
-
-        // Paginer les résultats
-        $pagination = $paginator->paginate(
-            $queryBuilder->getQuery(),
+        $livres = $paginator->paginate(
+            $rep->findAll(),
             $request->query->getInt('page', 1),
-            12 // Nombre d'éléments par page
+            10
         );
-
-        // Récupérer toutes les catégories
-        $categories = $this->categoriesRepository->findAll();
-
-        // Ajouter un message flash pour le débogage
-        if ($search) {
-            $this->addFlash('info', 'Recherche effectuée pour: ' . $search);
-        }
-
-        return $this->render('livres/all.html.twig', [
-            'livres' => $pagination,
-            'search' => $search,
-            'categories' => $categories // Add this line
-        ]);
+        return $this->render('livres/all.html.twig.twig', ['livres' => $livres]);
     }
 
     #[Route('/livres/show/{id}', name: 'app_livres_show')]
@@ -74,14 +34,7 @@ final class LivresController extends AbstractController
         if (!$livre) {
             throw $this->createNotFoundException("Livre not found");
         }
-
-        // Récupérer toutes les catégories
-        $categories = $this->categoriesRepository->findAll();
-
-        return $this->render('livres/detail.html.twig', [
-            'livre' => $livre,
-            'categories' => $categories // Add this line
-        ]);
+        return $this->render('livres/detail.html.twig', ['livre' => $livre]);
     }
 
     #[Route('/livres/create', name: 'app_livres_create')]
@@ -96,13 +49,8 @@ final class LivresController extends AbstractController
             $this->addFlash('success', 'Le livre a été bien ajouté');
             return $this->redirectToRoute('app_livres_all');
         }
-
-        // Récupérer toutes les catégories
-        $categories = $this->categoriesRepository->findAll();
-
         return $this->render('livres/create.html.twig', [
             'form' => $form,
-            'categories' => $categories // Add this line
         ]);
     }
 
@@ -119,13 +67,8 @@ final class LivresController extends AbstractController
             $this->addFlash('success', 'Le livre a été bien modifié');
             return $this->redirectToRoute('app_livres_all');
         }
-
-        // Récupérer toutes les catégories
-        $categories = $this->categoriesRepository->findAll();
-
         return $this->render('livres/update.html.twig', [
             'form' => $form,
-            'categories' => $categories // Add this line
         ]);
     }
 

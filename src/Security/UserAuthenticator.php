@@ -47,13 +47,13 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
+
         $roles = $token->getRoleNames();
-        if(in_array('ROLE_ADMIN', $roles)){
-            return new RedirectResponse($this->urlGenerator->generate('admin_livres'));
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
         }
 
-        // Rediriger les utilisateurs normaux vers la page d'accueil
-        return new RedirectResponse($this->urlGenerator->generate('app_home'));
+        return new RedirectResponse($this->urlGenerator->generate('app_livres_index'));
     }
 
     protected function getLoginUrl(Request $request): string

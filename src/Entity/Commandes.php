@@ -16,63 +16,21 @@ class Commandes
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $reference = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $statut = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $date = null;
-
     #[ORM\ManyToOne(inversedBy: 'commandes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeLivres::class)]
-    private Collection $commandeLivres;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateCommande = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column]
     private ?float $montantTotal = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?float $sousTotal = null;
+    #[ORM\Column(length: 50)]
+    private ?string $statut = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?float $fraisLivraison = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?float $tva = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $methodePaiement = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $datePaiement = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $email = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $prenom = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $nom = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $telephone = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $adresse = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $codePostal = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $ville = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $gouvernorat = null;
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeLivres::class, cascade: ['persist', 'remove'])]
+    private Collection $commandeLivres;
 
     public function __construct()
     {
@@ -84,14 +42,36 @@ class Commandes
         return $this->id;
     }
 
-    public function getReference(): ?string
+    public function getUser(): ?User
     {
-        return $this->reference;
+        return $this->user;
     }
 
-    public function setReference(string $reference): static
+    public function setUser(?User $user): static
     {
-        $this->reference = $reference;
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getDateCommande(): ?\DateTimeInterface
+    {
+        return $this->dateCommande;
+    }
+
+    public function setDateCommande(\DateTimeInterface $dateCommande): static
+    {
+        $this->dateCommande = $dateCommande;
+        return $this;
+    }
+
+    public function getMontantTotal(): ?float
+    {
+        return $this->montantTotal;
+    }
+
+    public function setMontantTotal(float $montantTotal): static
+    {
+        $this->montantTotal = $montantTotal;
         return $this;
     }
 
@@ -103,28 +83,6 @@ class Commandes
     public function setStatut(string $statut): static
     {
         $this->statut = $statut;
-        return $this;
-    }
-
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): static
-    {
-        $this->date = $date;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
         return $this;
     }
 
@@ -152,179 +110,6 @@ class Commandes
                 $commandeLivre->setCommande(null);
             }
         }
-        return $this;
-    }
-
-    /**
-     * Calcule le montant total de la commande.
-     *
-     * @return float|null
-     */
-    public function getMontantTotalFinal(): ?float
-    {
-        $total = 0.0;
-
-        foreach ($this->commandeLivres as $commandeLivre) {
-            $livre = $commandeLivre->getLivre();
-            if ($livre && $livre->getPrix()) {
-                $total += $livre->getPrix() * $commandeLivre->getQuantite();
-            }
-        }
-
-        return $total > 0 ? $total : null;
-    }
-
-    public function getMontantTotal(): ?float
-    {
-        return $this->montantTotal;
-    }
-
-    public function setMontantTotal(?float $montantTotal): static
-    {
-        $this->montantTotal = $montantTotal;
-        return $this;
-    }
-
-    public function getSousTotal(): ?float
-    {
-        return $this->sousTotal;
-    }
-
-    public function setSousTotal(?float $sousTotal): static
-    {
-        $this->sousTotal = $sousTotal;
-        return $this;
-    }
-
-    public function getFraisLivraison(): ?float
-    {
-        return $this->fraisLivraison;
-    }
-
-    public function setFraisLivraison(?float $fraisLivraison): static
-    {
-        $this->fraisLivraison = $fraisLivraison;
-        return $this;
-    }
-
-    public function getTva(): ?float
-    {
-        return $this->tva;
-    }
-
-    public function setTva(?float $tva): static
-    {
-        $this->tva = $tva;
-        return $this;
-    }
-
-    public function getMethodePaiement(): ?string
-    {
-        return $this->methodePaiement;
-    }
-
-    public function setMethodePaiement(?string $methodePaiement): static
-    {
-        $this->methodePaiement = $methodePaiement;
-        return $this;
-    }
-
-    public function getDatePaiement(): ?\DateTimeInterface
-    {
-        return $this->datePaiement;
-    }
-
-    public function setDatePaiement(?\DateTimeInterface $datePaiement): static
-    {
-        $this->datePaiement = $datePaiement;
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(?string $email): static
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    public function getPrenom(): ?string
-    {
-        return $this->prenom;
-    }
-
-    public function setPrenom(?string $prenom): static
-    {
-        $this->prenom = $prenom;
-        return $this;
-    }
-
-    public function getNom(): ?string
-    {
-        return $this->nom;
-    }
-
-    public function setNom(?string $nom): static
-    {
-        $this->nom = $nom;
-        return $this;
-    }
-
-    public function getTelephone(): ?string
-    {
-        return $this->telephone;
-    }
-
-    public function setTelephone(?string $telephone): static
-    {
-        $this->telephone = $telephone;
-        return $this;
-    }
-
-    public function getAdresse(): ?string
-    {
-        return $this->adresse;
-    }
-
-    public function setAdresse(?string $adresse): static
-    {
-        $this->adresse = $adresse;
-        return $this;
-    }
-
-    public function getCodePostal(): ?string
-    {
-        return $this->codePostal;
-    }
-
-    public function setCodePostal(?string $codePostal): static
-    {
-        $this->codePostal = $codePostal;
-        return $this;
-    }
-
-    public function getVille(): ?string
-    {
-        return $this->ville;
-    }
-
-    public function setVille(?string $ville): static
-    {
-        $this->ville = $ville;
-        return $this;
-    }
-
-    public function getGouvernorat(): ?string
-    {
-        return $this->gouvernorat;
-    }
-
-    public function setGouvernorat(?string $gouvernorat): static
-    {
-        $this->gouvernorat = $gouvernorat;
         return $this;
     }
 }

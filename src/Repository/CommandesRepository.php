@@ -15,24 +15,4 @@ class CommandesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Commandes::class);
     }
-
-    // Ajoutez vos méthodes personnalisées ici si nécessaire
-
-    public function save(Commandes $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Commandes $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
 }

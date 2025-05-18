@@ -1,5 +1,4 @@
 <?php
-// src/Repository/CommandeLivresRepository.php
 
 namespace App\Repository;
 
@@ -16,6 +15,4 @@ class CommandeLivresRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CommandeLivres::class);
     }
-
-    // Ajoutez vos méthodes personnalisées ici
 }
