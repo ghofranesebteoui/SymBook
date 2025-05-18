@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de commande</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        .confirmation-message {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .order-details {
+            margin: 20px 0;
+        }
+        .order-detail {
+            margin-bottom: 10px;
+        }
+        .order-detail-label {
+            font-weight: bold;
+        }
+        .order-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .order-items th, .order-items td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .order-items th {
+            background-color: #f8f9fa;
+        }
+        .order-summary {
+            margin: 20px 0;
+            text-align: right;
+        }
+        .order-summary-row {
+            margin-bottom: 5px;
+        }
+        .order-total {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>SymBook</h1>
+    <p>Votre librairie en ligne</p>
+</div>
+
+<div class="confirmation-message">
+    <h2>Merci pour votre commande !</h2>
+    <p>
+        Cher(e) {{ commande.prenom }} {{ commande.nom }},<br>
+        Nous avons bien reçu votre commande et nous vous en remercions.
+        {% if commande.methodePaiement == 'card' %}
+            Votre paiement a été traité avec succès et votre commande est en cours de préparation.
+        {% else %}
+            Votre commande est en cours de préparation et sera livrée dans les plus brefs délais. Le paiement se fera à la livraison.
+        {% endif %}
+    </p>
+</div>
+
+<div class="order-details">
+    <div class="order-detail">
+        <span class="order-detail-label">Numéro de commande :</span>
+        <span>{{ commande.reference }}</span>
+    </div>
+    <div class="order-detail">
+        <span class="order-detail-label">Date :</span>
+        <span>{{ commande.date|date('d/m/Y H:i') }}</span>
+    </div>
+    <div class="order-detail">
+        <span class="order-detail-label">Statut :</span>
+        <span>{{ commande.statut }}</span>
+    </div>
+    <div class="order-detail">
+        <span class="order-detail-label">Méthode de paiement :</span>
+        <span>
+                {% if commande.methodePaiement == 'card' %}
+                    Carte bancaire
+                {% elseif commande.methodePaiement == 'cashOnDelivery' %}
+                    Paiement à la livraison
+                {% else %}
+                    {{ commande.methodePaiement }}
+                {% endif %}
+            </span>
+    </div>
+</div>
+
+
+<h3>Articles commandés</h3>
+<table class="order-items">
+    <thead>
+    <tr>
+        <th>Article</th>
+        <th>Quantité</th>
+        <th>Prix unitaire</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in commande.commandeLivres %}
+        <tr>
+            <td>{{ item.livre.titre }}</td>
+            <td>{{ item.quantite }}</td>
+            <td>{{ item.price|number_format(2, ',', ' ') }} DT</td>
+            <td>{{ (item.price * item.quantite)|number_format(2, ',', ' ') }} DT</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="order-summary">
+    <div class="order-summary-row">
+        <span class="order-summary-label">Sous-total :</span>
+        <span>{{ commande.sousTotal|number_format(2, ',', ' ') }} DT</span>
+    </div>
+    <div class="order-summary-row">
+        <span class="order-summary-label">Frais de livraison :</span>
+        <span>{{ commande.fraisLivraison|number_format(2, ',', ' ') }} DT</span>
+    </div>
+    <div class="order-summary-row">
+        <span class="order-summary-label">TVA (20%) :</span>
+        <span>{{ commande.tva|number_format(2, ',', ' ') }} DT</span>
+    </div>
+    <div class="order-total">
+        <span class="order-summary-label">Total :</span>
+        <span>{{ commande.montantTotal|number_format(2, ',', ' ') }} DT</span>
+    </div>
+</div>
+
+<h3>Adresse de livraison</h3>
+<p>
+    {{ commande.prenom }} {{ commande.nom }}<br>
+    {{ commande.adresse }}<br>
+    {{ commande.codePostal }} {{ commande.ville }}<br>
+    Gouvernorat: {{ commande.gouvernorat }}<br>
+    Téléphone: {{ commande.telephone }}
+</p>
+
+<p>
+    Vous pouvez suivre l'état de votre commande en vous connectant à votre compte sur notre site.
+</p>
+
+<div class="footer">
+    <p>
+        Si vous avez des questions concernant votre commande, n'hésitez pas à nous contacter à l'adresse <a href="mailto:contact@symbook.com">contact@symbook.com</a> ou par téléphone au +216 XX XXX XXX.
+    </p>
+    <p>
+        &copy; {{ "now"|date("Y") }} SymBook. Tous droits réservés.
+    </p>
+</div>
+</body>
+</html>

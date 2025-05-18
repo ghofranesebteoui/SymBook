@@ -1,0 +1,81 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Historique des commandes{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title">Historique des commandes</h1>
+            <p class="hero-subtitle">Consultez l'historique de toutes vos commandes passées.</p>
+        </div>
+        <div class="hero-shape"></div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="user-content">
+                <h2 class="user-content-title">Mes commandes</h2>
+
+                {% if commandes is empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-bag fa-4x mb-4" style="color: #ddd;"></i>
+                        <h3>Aucune commande</h3>
+                        <p class="text-muted mb-4">Vous n'avez pas encore passé de commande.</p>
+                        <a href="{{ path('app_livres_all') }}" class="btn hero-btn">Parcourir les livres</a>
+                    </div>
+                {% else %}
+                    {% for commande in commandes %}
+                        <div class="order-card mb-4">
+                            <div class="order-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="order-number">Commande #{{ commande.id }}</span>
+                                    <span class="order-date ms-3">{{ commande.date|date('d/m/Y H:i') }}</span>
+                                </div>
+                                <div>
+                                    {% if commande.status == 'En attente de paiement' %}
+                                        <span class="order-status order-status-pending">{{ commande.status }}</span>
+                                    {% elseif commande.status == 'En cours de traitement' %}
+                                        <span class="order-status order-status-processing">{{ commande.status }}</span>
+                                    {% elseif commande.status == 'Payée' or commande.status == 'Livrée' %}
+                                        <span class="order-status order-status-completed">{{ commande.status }}</span>
+                                    {% elseif commande.status == 'Annulée' %}
+                                        <span class="order-status order-status-cancelled">{{ commande.status }}</span>
+                                    {% else %}
+                                        <span class="order-status">{{ commande.status }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="order-body">
+                                <div class="order-items">
+                                    {% for item in commande.commandeLivres %}
+                                        <div class="order-item d-flex align-items-center mb-3">
+                                            <img src="{{ item.livre.image|default('https://m.media-amazon.com/images/I/51aWTLR3E0L._SX331_BO1,204,203,200_.jpg') }}" alt="{{ item.livre.titre }}" class="order-item-img me-3">
+                                            <div class="order-item-details flex-grow-1">
+                                                <h5 class="order-item-title mb-1">{{ item.livre.titre }}</h5>
+                                                <p class="order-item-author mb-1">{{ item.livre.editeur }}</p>
+                                                <span class="order-item-price">{{ item.livre.prix|number_format(2, ',', ' ') }} DT x {{ item.quantite }}</span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="order-total mt-3">
+                                    Total: {{ commande.montantTotalFinal|number_format(2, ',', ' ') }} DT
+                                </div>
+                                <div class="order-actions mt-3">
+                                    <a href="{{ path('app_commande_detail', {'id': commande.id}) }}" class="btn hero-btn me-2">
+                                        <i class="fas fa-eye me-1"></i> Voir les détails
+                                    </a>
+                                    {% if commande.status == 'En attente de paiement' %}
+                                        <a href="{{ path('app_commande_paiement', {'id': commande.id}) }}" class="btn hero-btn">
+                                            <i class="fas fa-credit-card me-1"></i> Payer
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

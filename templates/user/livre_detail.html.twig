@@ -1,0 +1,225 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SymBook - {{ livre.titre|default('Détails du livre') }}{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_home') }}">SymBook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_home') }}"><i class="fas fa-home me-1"></i> Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_livres_all') }}"><i class="fas fa-book me-1"></i> Livres</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_commande_historique') }}"><i class="fas fa-user me-1"></i> Mon compte</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_panier') }}">
+                            <i class="fas fa-shopping-cart me-1"></i> Panier
+                            <span class="badge bg-primary rounded-pill">{{ app.session.get('panier')|length|default(0) }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_login') }}"><i class="fas fa-sign-in-alt me-1"></i> Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="searchIcon"><i class="fas fa-search me-1"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="book-details py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="book-card">
+                        <div class="card-img-container">
+                            <img src="{{ livre.image|default('https://m.media-amazon.com/images/I/51aWTLR3E0L._SX331_BO1,204,203,200_.jpg') }}" class="card-img-top book-img" alt="{{ livre.titre }}">
+                            {% if livre.prix < 15 %}
+                                <div class="book-badge">Promo</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <h2 class="section-title">{{ livre.titre|default('Titre indisponible') }}</h2>
+                    <p class="mb-3"><strong>Auteur :</strong> {{ livre.editeur|default('Auteur inconnu') }}</p>
+                    <p class="mb-3"><strong>Catégorie :</strong> {{ livre.categorie.libelle|default('Non catégorisé') }}</p>
+
+                    <!-- Onglets pour organiser les informations -->
+                    <ul class="nav nav-tabs mb-4" id="bookDetailTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="resume-tab" data-bs-toggle="tab" data-bs-target="#resume" type="button" role="tab" aria-controls="resume" aria-selected="true">Résumé</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false">Détails</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="avis-tab" data-bs-toggle="tab" data-bs-target="#avis" type="button" role="tab" aria-controls="avis" aria-selected="false">Avis</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="bookDetailTabsContent">
+                        <div class="tab-pane fade show active" id="resume" role="tabpanel" aria-labelledby="resume-tab">
+                            <p>{{ livre.resume|default('Résumé indisponible') }}</p>
+                        </div>
+                        <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <th>ISBN</th>
+                                    <td>{{ livre.isbn|default('Non disponible') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Éditeur</th>
+                                    <td>{{ livre.editeur|default('Non disponible') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date de publication</th>
+                                    <td>{{ livre.dateEdition|date('d/m/Y')|default('Non disponible') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nombre de pages</th>
+                                    <td>{{ livre.pages|default('Non disponible') }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="avis" role="tabpanel" aria-labelledby="avis-tab">
+                            {% if livre.avis is defined and livre.avis|length > 0 %}
+                                {% for avis in livre.avis %}
+                                    <div class="review-item mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <h5>{{ avis.utilisateur.nom }}</h5>
+                                            <div class="rating">
+                                                {% for i in 1..5 %}
+                                                    {% if i <= avis.note %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <p>{{ avis.commentaire }}</p>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>Aucun avis pour ce livre.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="book-purchase-info mt-4">
+                        <p class="mb-4"><strong>Prix :</strong> <span class="book-price">{{ livre.prix|default('0.00')|number_format(2) }} DT</span></p>
+                        <div class="d-flex gap-3">
+                            <!-- Bouton d'ajout au panier avec popup -->
+                            <div class="input-group" style="max-width: 150px; margin-right: 10px;">
+                                <input type="number" id="quantity" value="1" min="1" class="form-control" style="height: 100%;">
+                            </div>
+                            <button type="button" class="btn hero-btn add-to-cart-btn" data-book-id="{{ livre.id }}">
+                                <i class="fas fa-cart-plus me-2"></i>Ajouter au panier
+                            </button>
+                            <a href="{{ path('app_livres_all') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal pour l'ajout au panier -->
+    <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addToCartModalLabel">Produit ajouté au panier</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <img src="{{ livre.image|default('https://m.media-amazon.com/images/I/51aWTLR3E0L._SX331_BO1,204,203,200_.jpg') }}" alt="{{ livre.titre }}" style="width: 80px; height: auto;">
+                        </div>
+                        <div>
+                            <h5>{{ livre.titre }}</h5>
+                            <p class="mb-0">Prix: <span id="modalItemPrice">{{ livre.prix|number_format(2) }} DT</span></p>
+                            <p class="mb-0">Quantité: <span id="modalItemQuantity">1</span></p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <p class="mb-0">Sous-total du panier: <span id="modalCartTotal">{{ livre.prix|number_format(2) }} DT</span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Continuer mes achats</button>
+                    <a href="{{ path('app_panier') }}" class="btn hero-btn">Voir mon panier</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de l'ajout au panier avec popup
+            const addToCartBtn = document.querySelector('.add-to-cart-btn');
+            const quantityInput = document.getElementById('quantity');
+
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    const bookId = this.getAttribute('data-book-id');
+                    const quantity = quantityInput.value;
+
+                    // Mettre à jour les informations du modal
+                    document.getElementById('modalItemQuantity').textContent = quantity;
+
+                    const itemPrice = parseFloat('{{ livre.prix|default('0.00') }}');
+                    const totalPrice = (itemPrice * quantity).toFixed(2);
+                    document.getElementById('modalCartTotal').textContent = totalPrice + ' DT';
+
+                    // Afficher le modal
+                    const modal = new bootstrap.Modal(document.getElementById('addToCartModal'));
+                    modal.show();
+
+                    // Envoyer la requête AJAX pour ajouter au panier
+                    fetch('{{ path('app_panier_ajouter', {'id': livre.id}) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: 'quantity=' + quantity
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Mettre à jour le compteur du panier dans la navbar
+                                const cartBadge = document.querySelector('.nav-icon .badge');
+                                if (cartBadge) {
+                                    cartBadge.textContent = data.cartCount;
+                                    cartBadge.style.display = 'block';
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                        });
+                });
+            }
+        });
+    </script>
+{% endblock %}

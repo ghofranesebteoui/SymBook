@@ -1,0 +1,309 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}SymBook - Tableau de bord administrateur{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Tableau de bord</h1>
+            <a href="{{ path('app_livres_create') }}" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Ajouter un livre
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Statistiques des ventes -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Ventes (Mensuel)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalSales|default(0)|number_format(2, ',', ' ') }} DT</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques des commandes -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Commandes (Mensuel)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalOrders|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques des utilisateurs -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Utilisateurs</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalUsers|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques des livres -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Livres</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalBooks|default(0) }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-book fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Graphique des ventes -->
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Aperçu des revenus</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique des commandes par statut -->
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Statut des commandes</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="orderStatusChart"></canvas>
+                        </div>
+                        <div class="mt-4 text-center small">
+                            <span class="mr-2">
+                                <i class="fas fa-circle text-primary"></i> En attente
+                            </span>
+                            <span class="mr-2">
+                                <i class="fas fa-circle text-success"></i> Complétées
+                            </span>
+                            <span class="mr-2">
+                                <i class="fas fa-circle text-info"></i> En cours
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Dernières commandes -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Dernières commandes</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order in recentOrders|default([]) %}
+                                    <tr>
+                                        <td>{{ order.reference }}</td>
+                                        <td>{{ order.user.prenom }} {{ order.user.nom }}</td>
+                                        <td>{{ order.date|date('d/m/Y') }}</td>
+                                        <td>{{ order.montantTotal|number_format(2, ',', ' ') }} DT</td>
+                                        <td>
+                                            {% if order.statut == 'completed' %}
+                                                <span class="badge bg-success">Complétée</span>
+                                            {% elseif order.statut == 'pending' %}
+                                                <span class="badge bg-warning">En attente</span>
+                                            {% else %}
+                                                <span class="badge bg-info">En cours</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">Aucune commande récente</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Livres les plus vendus -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Livres les plus vendus</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Prix</th>
+                                    <th>Ventes</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for book in topSellingBooks|default([]) %}
+                                    <tr>
+                                        <td>{{ book.titre }}</td>
+                                        <td>{{ book.categorie.libelle }}</td>
+                                        <td>{{ book.prix|number_format(2, ',', ' ') }} DT</td>
+                                        <td>{{ book.sales|default(0) }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">Aucune donnée disponible</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Graphique des ventes
+            var salesCtx = document.getElementById('salesChart');
+            var salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ salesChartLabels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Revenus',
+                        lineTension: 0.3,
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointBorderColor: 'rgba(78, 115, 223, 1)',
+                        pointHoverRadius: 3,
+                        pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
+                        pointHitRadius: 10,
+                        pointBorderWidth: 2,
+                        data: {{ salesChartData|json_encode|raw }},
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 25,
+                            top: 25,
+                            bottom: 0
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' DT';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' DT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Graphique des commandes par statut
+            var orderStatusCtx = document.getElementById('orderStatusChart');
+            var orderStatusChart = new Chart(orderStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['En attente', 'Complétées', 'En cours'],
+                    datasets: [{
+                        data: {{ orderStatusData|json_encode|raw }},
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                        hoverBorderColor: 'rgba(234, 236, 244, 1)',
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    cutout: '70%',
+                }
+            });
+        });
+    </script>
+{% endblock %}

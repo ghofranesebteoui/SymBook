@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SymBook Admin{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #858796;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background-color: #4e73df;
+            background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+            background-size: cover;
+            position: fixed;
+            z-index: 1;
+            width: 225px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-brand {
+            height: 4.375rem;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 800;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            letter-spacing: 0.05rem;
+            z-index: 1;
+        }
+
+        .sidebar-brand-icon {
+            font-size: 2rem;
+        }
+
+        .sidebar-brand-text {
+            display: inline;
+            font-size: 1.2rem;
+        }
+
+        .sidebar hr {
+            margin: 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-heading {
+            text-align: left;
+            padding: 0 1rem;
+            font-weight: 800;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+            opacity: 0.75;
+        }
+
+        .content {
+            flex: 1 0 auto;
+            margin-left: 225px;
+            padding: 1.5rem;
+        }
+
+        .topbar {
+            height: 4.375rem;
+            background-color: #fff;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .topbar .navbar-search {
+            width: 25rem;
+        }
+
+        .topbar .dropdown-list {
+            width: 20rem !important;
+        }
+
+        .topbar .dropdown-menu {
+            position: absolute;
+            right: 0;
+            left: auto;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .dropdown-item {
+            transition: all 0.3s;
+        }
+
+        .dropdown-item:active {
+            background-color: #4e73df;
+        }
+
+        .card {
+            margin-bottom: 1.5rem;
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .card-body {
+            flex: 1 1 auto;
+            min-height: 1px;
+            padding: 1.25rem;
+        }
+
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        .border-left-danger {
+            border-left: 0.25rem solid #e74a3b !important;
+        }
+
+        .chart-area {
+            position: relative;
+            height: 20rem;
+            width: 100%;
+        }
+
+        .chart-pie {
+            position: relative;
+            height: 15rem;
+            width: 100%;
+        }
+
+        footer.sticky-footer {
+            padding: 2rem 0;
+            flex-shrink: 0;
+            background-color: #fff;
+            box-shadow: 0 -0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .bg-gradient-primary {
+            background-color: #4e73df;
+            background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+            background-size: cover;
+        }
+
+        .text-xs {
+            font-size: .7rem;
+        }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-success {
+            color: #1cc88a !important;
+        }
+
+        .text-info {
+            color: #36b9cc !important;
+        }
+
+        .text-warning {
+            color: #f6c23e !important;
+        }
+
+        .text-danger {
+            color: #e74a3b !important;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2653d4;
+        }
+
+        .btn-success {
+            background-color: #1cc88a;
+            border-color: #1cc88a;
+        }
+
+        .btn-success:hover {
+            background-color: #17a673;
+            border-color: #169b6b;
+        }
+
+        .btn-info {
+            background-color: #36b9cc;
+            border-color: #36b9cc;
+        }
+
+        .btn-info:hover {
+            background-color: #2c9faf;
+            border-color: #2a96a5;
+        }
+
+        .btn-warning {
+            background-color: #f6c23e;
+            border-color: #f6c23e;
+        }
+
+        .btn-warning:hover {
+            background-color: #f4b619;
+            border-color: #f4b30d;
+        }
+
+        .btn-danger {
+            background-color: #e74a3b;
+            border-color: #e74a3b;
+        }
+
+        .btn-danger:hover {
+            background-color: #e02d1b;
+            border-color: #d52a1a;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 6.5rem;
+                overflow: visible;
+            }
+
+            .sidebar .nav-item .nav-link span {
+                display: none;
+            }
+
+            .sidebar .nav-item .nav-link {
+                text-align: center;
+                padding: 0.75rem 1rem;
+                width: 6.5rem;
+            }
+
+            .sidebar .nav-item .nav-link i {
+                margin-right: 0;
+                font-size: 1.1rem;
+            }
+
+            .sidebar .sidebar-brand .sidebar-brand-text {
+                display: none;
+            }
+
+            .content {
+                margin-left: 6.5rem;
+            }
+        }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('app_dashboard') }}">
+            <div class="sidebar-brand-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">SymBook</div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item {% if app.request.get('_route') == 'app_dashboard' %}active{% endif %}">
+            <a class="nav-link" href="{{ path('app_dashboard') }}">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Tableau de bord</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Catalogue
+        </div>
+
+        <!-- Nav Item - Livres -->
+        <li class="nav-item {% if app.request.get('_route') starts with 'app_livres_' %}active{% endif %}">
+            <a class="nav-link" href="{{ path('app_livres_all') }}">
+                <i class="fas fa-fw fa-book"></i>
+                <span>Livres</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Catégories -->
+        <li class="nav-item {% if app.request.get('_route') starts with 'app_categories_' %}active{% endif %}">
+            <a class="nav-link" href="{{ path('app_categories_all') }}">
+                <i class="fas fa-fw fa-tags"></i>
+                <span>Catégories</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Ventes
+        </div>
+
+        <!-- Nav Item - Commandes -->
+        <li class="nav-item {% if app.request.get('_route') starts with 'app_orders_' %}active{% endif %}">
+            <a class="nav-link" href="{{ path('app_orders_all') }}">
+                <i class="fas fa-fw fa-shopping-cart"></i>
+                <span>Commandes</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Utilisateurs
+        </div>
+
+        <!-- Nav Item - Utilisateurs -->
+        <li class="nav-item {% if app.request.get('_route') starts with 'app_users_' %}active{% endif %}">
+            <a class="nav-link" href="{{ path('app_users_all') }}">
+                <i class="fas fa-fw fa-users"></i>
+                <span>Utilisateurs</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle">
+                <i class="fas fa-angle-left text-white"></i>
+            </button>
+        </div>
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!-- Topbar Search -->
+                <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="Rechercher..." aria-label="Search" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                    <li class="nav-item dropdown no-arrow d-sm-none">
+                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <!-- Dropdown - Messages -->
+                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                            <form class="form-inline mr-auto w-100 navbar-search">
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light border-0 small" placeholder="Rechercher..." aria-label="Search" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button">
+                                            <i class="fas fa-search fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+
+                    <!-- Nav Item - Alerts -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bell fa-fw"></i>
+                            <!-- Counter - Alerts -->
+                            <span class="badge badge-danger badge-counter">3+</span>
+                        </a>
+                        <!-- Dropdown - Alerts -->
+                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                            <h6 class="dropdown-header">
+                                Alertes
+                            </h6>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-primary">
+                                        <i class="fas fa-file-alt text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">12 Avril 2023</div>
+                                    <span class="font-weight-bold">Une nouvelle commande a été passée!</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Voir toutes les alertes</a>
+                        </div>
+                    </li>
+
+                    <!-- Nav Item - Messages -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-envelope fa-fw"></i>
+                            <!-- Counter - Messages -->
+                            <span class="badge badge-danger badge-counter">7</span>
+                        </a>
+                        <!-- Dropdown - Messages -->
+                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                            <h6 class="dropdown-header">
+                                Messages
+                            </h6>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="dropdown-list-image mr-3">
+                                    <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="...">
+                                    <div class="status-indicator bg-success"></div>
+                                </div>
+                                <div>
+                                    <div class="text-truncate">Bonjour, je voudrais savoir si le livre est disponible...</div>
+                                    <div class="small text-gray-500">Sarah · 58m</div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Voir tous les messages</a>
+                        </div>
+                    </li>
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ app.user.prenom|default('Admin') }} {{ app.user.nom|default('') }}</span>
+                            <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profil
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Paramètres
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Déconnexion
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                {% block body %}{% endblock %}
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; SymBook 2023</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+    </div>
+    <!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Bootstrap core JavaScript-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Custom scripts -->
+<script>
+    // Toggle the side navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarToggleTop = document.getElementById('sidebarToggleTop');
+        const accordionSidebar = document.getElementById('accordionSidebar');
+        const contentWrapper = document.getElementById('content-wrapper');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('sidebar-toggled');
+                accordionSidebar.classList.toggle('toggled');
+
+                if (accordionSidebar.classList.contains('toggled')) {
+                    contentWrapper.style.marginLeft = '6.5rem';
+                    sidebarToggle.innerHTML = '<i class="fas fa-angle-right text-white"></i>';
+                } else {
+                    contentWrapper.style.marginLeft = '225px';
+                    sidebarToggle.innerHTML = '<i class="fas fa-angle-left text-white"></i>';
+                }
+            });
+        }
+
+        if (sidebarToggleTop) {
+            sidebarToggleTop.addEventListener('click', function(e) {
+                e.preventDefault();
+                accordionSidebar.classList.toggle('d-none');
+            });
+        }
+
+        // Close any open menu accordions when window is resized below 768px
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 768) {
+                accordionSidebar.classList.add('toggled');
+                contentWrapper.style.marginLeft = '6.5rem';
+                if (sidebarToggle) {
+                    sidebarToggle.innerHTML = '<i class="fas fa-angle-right text-white"></i>';
+                }
+            } else {
+                accordionSidebar.classList.remove('toggled');
+                contentWrapper.style.marginLeft = '225px';
+                if (sidebarToggle) {
+                    sidebarToggle.innerHTML = '<i class="fas fa-angle-left text-white"></i>';
+                }
+            }
+        });
+
+        // Scroll to top button
+        const scrollToTopButton = document.querySelector('.scroll-to-top');
+
+        if (scrollToTopButton) {
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 100) {
+                    scrollToTopButton.style.display = 'block';
+                } else {
+                    scrollToTopButton.style.display = 'none';
+                }
+            });
+
+            scrollToTopButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    });
+</script>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

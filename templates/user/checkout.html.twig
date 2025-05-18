@@ -1,0 +1,355 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Paiement{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title">Finaliser votre commande</h1>
+            <p class="hero-subtitle">Complétez vos informations de livraison et choisissez votre mode de paiement.</p>
+        </div>
+        <div class="hero-shape"></div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <form action="{{ path('app_commande_confirmer') }}" method="POST">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="user-content mb-4">
+                            <h2 class="user-content-title">Adresse de livraison</h2>
+
+                            <div class="checkout-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="prenom">Prénom</label>
+                                        <input type="text" id="prenom" name="prenom" class="form-control" required value="{{ app.user.prenom|default('') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="nom">Nom</label>
+                                        <input type="text" id="nom" name="nom" class="form-control" required value="{{ app.user.nom|default('') }}">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="adresse">Adresse</label>
+                                        <input type="text" id="adresse" name="adresse" class="form-control" required value="{{ app.user.adresse|default('') }}">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="codePostal">Code postal</label>
+                                        <input type="text" id="codePostal" name="codePostal" class="form-control" required value="{{ app.user.codePostal|default('') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="ville">Ville</label>
+                                        <input type="text" name="ville" id="ville" class="form-control" value="{{ app.user.ville|default('') }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="telephone">Téléphone</label>
+                                        <input type="tel" id="telephone" name="telephone" class="form-control" required value="{{ app.user.telephone|default('') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email">Email</label>
+                                        <input type="email" id="email" name="email" class="form-control" required value="{{ app.user.email|default('') }}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="user-content">
+                            <h2 class="user-content-title">Mode de paiement</h2>
+
+                            <div class="payment-methods">
+                                <div class="payment-method active">
+                                    <input type="radio" name="paymentMethod" id="card" value="card" class="payment-method-radio" checked>
+                                    <div class="payment-method-icon">
+                                        <i class="far fa-credit-card"></i>
+                                    </div>
+                                    <div class="payment-method-details">
+                                        <h4 class="payment-method-title">Carte bancaire</h4>
+                                        <p class="payment-method-description">Paiement sécurisé par carte bancaire (Visa, Mastercard, etc.)</p>
+                                    </div>
+                                </div>
+
+                                <div class="payment-method">
+                                    <input type="radio" name="paymentMethod" id="cashOnDelivery" value="cashOnDelivery" class="payment-method-radio">
+                                    <div class="payment-method-icon">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div class="payment-method-details">
+                                        <h4 class="payment-method-title">Paiement à la livraison</h4>
+                                        <p class="payment-method-description">Payez en espèces à la réception de votre commande</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="cardPaymentForm" class="mt-4">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="cardNumber">Numéro de carte</label>
+                                        <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="1234 5678 9012 3456">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="cardExpiry">Date d'expiration</label>
+                                        <input type="text" id="cardExpiry" name="cardExpiry" class="form-control" placeholder="MM/AA">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cardCvc">Code de sécurité (CVC)</label>
+                                        <input type="text" id="cardCvc" name="cardCvc" class="form-control" placeholder="123">
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <label for="cardName">Nom sur la carte</label>
+                                        <input type="text" id="cardName" name="cardName" class="form-control" placeholder="John Doe">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="cashOnDeliveryInfo" class="mt-4" style="display: none;">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span>Vous paierez le montant total de <strong>{{ total|number_format(2) }} DT</strong> en espèces à la réception de votre commande.</span>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <label for="gouvernorat">Gouvernorat de livraison</label>
+                                        <select name="gouvernorat" id="gouvernorat" class="form-control" required>
+                                            <option value="">Sélectionnez un gouvernorat</option>
+                                            <option value="Ariana" {% if app.user.gouvernorat|default('') == 'Ariana' %}selected{% endif %}>Ariana</option>
+                                            <option value="Béja" {% if app.user.gouvernorat|default('') == 'Béja' %}selected{% endif %}>Béja</option>
+                                            <option value="Ben Arous" {% if app.user.gouvernorat|default('') == 'Ben Arous' %}selected{% endif %}>Ben Arous</option>
+                                            <option value="Bizerte" {% if app.user.gouvernorat|default('') == 'Bizerte' %}selected{% endif %}>Bizerte</option>
+                                            <option value="Gabès" {% if app.user.gouvernorat|default('') == 'Gabès' %}selected{% endif %}>Gabès</option>
+                                            <option value="Gafsa" {% if app.user.gouvernorat|default('') == 'Gafsa' %}selected{% endif %}>Gafsa</option>
+                                            <option value="Jendouba" {% if app.user.gouvernorat|default('') == 'Jendouba' %}selected{% endif %}>Jendouba</option>
+                                            <option value="Kairouan" {% if app.user.gouvernorat|default('') == 'Kairouan' %}selected{% endif %}>Kairouan</option>
+                                            <option value="Kasserine" {% if app.user.gouvernorat|default('') == 'Kasserine' %}selected{% endif %}>Kasserine</option>
+                                            <option value="Kébili" {% if app.user.gouvernorat|default('') == 'Kébili' %}selected{% endif %}>Kébili</option>
+                                            <option value="Le Kef" {% if app.user.gouvernorat|default('') == 'Le Kef' %}selected{% endif %}>Le Kef</option>
+                                            <option value="Mahdia" {% if app.user.gouvernorat|default('') == 'Mahdia' %}selected{% endif %}>Mahdia</option>
+                                            <option value="La Manouba" {% if app.user.gouvernorat|default('') == 'La Manouba' %}selected{% endif %}>La Manouba</option>
+                                            <option value="Médenine" {% if app.user.gouvernorat|default('') == 'Médenine' %}selected{% endif %}>Médenine</option>
+                                            <option value="Monastir" {% if app.user.gouvernorat|default('') == 'Monastir' %}selected{% endif %}>Monastir</option>
+                                            <option value="Nabeul" {% if app.user.gouvernorat|default('') == 'Nabeul' %}selected{% endif %}>Nabeul</option>
+                                            <option value="Sfax" {% if app.user.gouvernorat|default('') == 'Sfax' %}selected{% endif %}>Sfax</option>
+                                            <option value="Sidi Bouzid" {% if app.user.gouvernorat|default('') == 'Sidi Bouzid' %}selected{% endif %}>Sidi Bouzid</option>
+                                            <option value="Siliana" {% if app.user.gouvernorat|default('') == 'Siliana' %}selected{% endif %}>Siliana</option>
+                                            <option value="Sousse" {% if app.user.gouvernorat|default('') == 'Sousse' %}selected{% endif %}>Sousse</option>
+                                            <option value="Tataouine" {% if app.user.gouvernorat|default('') == 'Tataouine' %}selected{% endif %}>Tataouine</option>
+                                            <option value="Tozeur" {% if app.user.gouvernorat|default('') == 'Tozeur' %}selected{% endif %}>Tozeur</option>
+                                            <option value="Tunis" {% if app.user.gouvernorat|default('') == 'Tunis' %}selected{% endif %}>Tunis</option>
+                                            <option value="Zaghouan" {% if app.user.gouvernorat|default('') == 'Zaghouan' %}selected{% endif %}>Zaghouan</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" id="exactChangeCheck" name="exactChange">
+                                    <label class="form-check-label" for="exactChangeCheck">
+                                        Je m'engage à préparer le montant exact pour faciliter la livraison
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="user-content">
+                            <h2 class="user-content-title">Résumé de la commande</h2>
+
+                            <div class="cart-summary">
+                                {% for item in panier %}
+                                    <div class="cart-summary-row">
+                                        <span class="cart-summary-label">{{ item.livre.titre }} x{{ item.quantity }}</span>
+                                        <span class="cart-summary-value">{{ (item.livre.prix * item.quantity)|number_format(2) }} DT</span>
+                                    </div>
+                                {% endfor %}
+
+                                <hr>
+
+                                <div class="cart-summary-row">
+                                    <span class="cart-summary-label">Sous-total</span>
+                                    <span class="cart-summary-value">{{ sousTotal|number_format(2) }} DT</span>
+                                </div>
+                                <div class="cart-summary-row">
+                                    <span class="cart-summary-label">Frais de livraison</span>
+                                    <span class="cart-summary-value">{{ fraisLivraison|number_format(2) }} DT</span>
+                                </div>
+                                <div class="cart-summary-row">
+                                    <span class="cart-summary-label">TVA (20%)</span>
+                                    <span class="cart-summary-value">{{ tva|number_format(2) }} DT</span>
+                                </div>
+                                <div class="cart-summary-row cart-summary-total">
+                                    <span class="cart-summary-label">Total</span>
+                                    <span class="cart-summary-value">{{ total|number_format(2) }} DT</span>
+                                </div>
+
+                                <button type="submit" class="btn hero-btn w-100 mt-4">Confirmer et payer</button>
+                                <a href="{{ path('app_panier') }}" class="btn btn-outline-secondary w-100 mt-3">Retour au panier</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/payment-process.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des méthodes de paiement
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const cardPaymentForm = document.getElementById('cardPaymentForm');
+            const cashOnDeliveryInfo = document.getElementById('cashOnDeliveryInfo');
+            const gouvernoratSelect = document.getElementById('gouvernorat');
+            const cardFields = document.querySelectorAll('#cardPaymentForm input');
+
+            // Fonction pour valider le formulaire selon le mode de paiement
+            function updateFormValidation() {
+                const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+                if (selectedPaymentMethod === 'card') {
+                    // Rendre les champs de carte obligatoires
+                    cardFields.forEach(field => {
+                        field.setAttribute('required', 'required');
+                    });
+
+                    // Rendre le gouvernorat non obligatoire
+                    gouvernoratSelect.removeAttribute('required');
+                } else {
+                    // Rendre les champs de carte non obligatoires
+                    cardFields.forEach(field => {
+                        field.removeAttribute('required');
+                    });
+
+                    // Rendre le gouvernorat obligatoire
+                    gouvernoratSelect.setAttribute('required', 'required');
+                }
+            }
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    // Désélectionner tous les autres
+                    paymentMethods.forEach(m => m.classList.remove('active'));
+
+                    // Sélectionner celui-ci
+                    this.classList.add('active');
+
+                    // Cocher le radio button
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+
+                    // Afficher/masquer les formulaires selon la méthode
+                    if (radio.value === 'card') {
+                        cardPaymentForm.style.display = 'block';
+                        cashOnDeliveryInfo.style.display = 'none';
+                    } else if (radio.value === 'cashOnDelivery') {
+                        cardPaymentForm.style.display = 'none';
+                        cashOnDeliveryInfo.style.display = 'block';
+                    }
+
+                    // Mettre à jour la validation du formulaire
+                    updateFormValidation();
+                });
+            });
+
+            // Initialiser la validation du formulaire au chargement
+            updateFormValidation();
+
+            // Formatage du numéro de carte
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    let formattedValue = '';
+
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) {
+                            formattedValue += ' ';
+                        }
+                        formattedValue += value[i];
+                    }
+
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // Formatage de la date d'expiration
+            const cardExpiryInput = document.getElementById('cardExpiry');
+            if (cardExpiryInput) {
+                cardExpiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+
+                    if (value.length > 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+
+                    e.target.value = value;
+                });
+            }
+
+            // Validation du formulaire avant soumission
+            const paymentForm = document.querySelector('form');
+            paymentForm.addEventListener('submit', function(e) {
+                const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+                if (selectedPaymentMethod === 'card') {
+                    // Valider les champs de carte bancaire
+                    const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+                    const cardExpiry = document.getElementById('cardExpiry').value;
+                    const cardCvc = document.getElementById('cardCvc').value;
+                    const cardName = document.getElementById('cardName').value;
+
+                    let isValid = true;
+                    let errorMessage = '';
+
+                    if (cardNumber.length < 16) {
+                        isValid = false;
+                        errorMessage += 'Le numéro de carte doit contenir 16 chiffres.\n';
+                    }
+
+                    if (!cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+                        isValid = false;
+                        errorMessage += 'La date d\'expiration doit être au format MM/AA.\n';
+                    }
+
+                    if (cardCvc.length < 3) {
+                        isValid = false;
+                        errorMessage += 'Le code de sécurité doit contenir 3 chiffres.\n';
+                    }
+
+                    if (cardName.trim() === '') {
+                        isValid = false;
+                        errorMessage += 'Veuillez entrer le nom sur la carte.\n';
+                    }
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        alert('Veuillez corriger les erreurs suivantes:\n' + errorMessage);
+                    }
+                } else if (selectedPaymentMethod === 'cashOnDelivery') {
+                    // Valider le gouvernorat pour le paiement à la livraison
+                    if (gouvernoratSelect.value === '') {
+                        e.preventDefault();
+                        alert('Veuillez sélectionner un gouvernorat pour la livraison.');
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

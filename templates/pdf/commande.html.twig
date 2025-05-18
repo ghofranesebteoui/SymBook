@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Facture - Commande #{{ commande.reference }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .invoice-info {
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .invoice-info-left, .invoice-info-right {
+            width: 48%;
+        }
+        .invoice-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .order-details {
+            margin: 20px 0;
+        }
+        .order-detail {
+            margin-bottom: 10px;
+        }
+        .order-detail-label {
+            font-weight: bold;
+        }
+        .order-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .order-items th, .order-items td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .order-items th {
+            background-color: #f8f9fa;
+        }
+        .order-summary {
+            margin: 20px 0;
+            text-align: right;
+        }
+        .order-summary-row {
+            margin-bottom: 5px;
+        }
+        .order-total {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #777;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>SymBook</h1>
+    <p>Votre librairie en ligne</p>
+</div>
+
+<div class="invoice-title">
+    Facture - Commande #{{ commande.reference }}
+</div>
+
+<div class="invoice-info">
+    <div class="invoice-info-left">
+        <h3>Adressé à :</h3>
+        <p>
+            {{ commande.prenom }} {{ commande.nom }}<br>
+            {{ commande.adresse }}<br>
+            {{ commande.codePostal }} {{ commande.ville }}<br>
+            Gouvernorat: {{ commande.gouvernorat }}<br>
+            Email: {{ commande.email }}<br>
+            Téléphone: {{ commande.telephone }}
+        </p>
+    </div>
+    <div class="invoice-info-right">
+        <h3>Détails de la facture :</h3>
+        <p>
+            <strong>Numéro de facture :</strong> F-{{ commande.reference }}<br>
+            <strong>Date de facture :</strong> {{ commande.date|date('d/m/Y') }}<br>
+            <strong>Méthode de paiement :</strong>
+            {% if commande.methodePaiement == 'card' %}
+                Carte bancaire
+            {% elseif commande.methodePaiement == 'cashOnDelivery' %}
+                Paiement à la livraison
+            {% else %}
+                {{ commande.methodePaiement }}
+            {% endif %}
+            <br>
+            <strong>Statut :</strong> {{ commande.statut }}
+            {% if commande.methodePaiement == 'cashOnDelivery' %}
+                <br><strong>Note :</strong> À payer à la livraison
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<h3>Articles commandés</h3>
+<table class="order-items">
+    <thead>
+    <tr>
+        <th>Article</th>
+        <th>Quantité</th>
+        <th>Prix unitaire</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in commande.commandeLivres %}
+        <tr>
+            <td>{{ item.livre.titre }}</td>
+            <td>{{ item.quantite }}</td>
+            <td>{{ item.price|number_format(2, ',', ' ') }} DT</td>
+            <td>{{ (item.price * item.quantite)|number_format(2, ',', ' ') }} DT</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="order-summary">
+    <div class="order-summary-row">
+        <span class="order-summary-label">Sous-total :</span>
+        <span>{{ commande.sousTotal|number_format(2, ',', ' ') }} DT</span>
+    </div>
+    <div class="order-summary-row">
+        <span class="order-summary-label">Frais de livraison :</span>
+        <span>{{ commande.fraisLivraison|number_format(2, ',', ' ') }} DT</span>
+    </div>
+    <div class="order-summary-row">
+        <span class="order-summary-label">TVA (20%) :</span>
+        <span>{{ commande.tva|number_format(2, ',', ' ') }} DT</span>
+    </div>
+    <div class="order-total">
+        <span class="order-summary-label">Total :</span>
+        <span>{{ commande.montantTotal|number_format(2, ',', ' ') }} DT</span>
+    </div>
+</div>
+
+<div class="footer">
+    <p>
+        SymBook - Adresse: 123 Rue de la Librairie, Tunis - Tél: +216 XX XXX XXX - Email: contact@symbook.com<br>
+        SIRET: 123456789 - TVA: TN123456789
+    </p>
+    <p>
+        &copy; {{ "now"|date("Y") }} SymBook. Tous droits réservés.
+    </p>
+</div>
+</body>
+</html>

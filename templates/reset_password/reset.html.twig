@@ -1,0 +1,167 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réinitialisation de mot de passe - SymBook{% endblock %}
+
+{% block body %}
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="user-content">
+                        <h1 class="text-center mb-4">Réinitialiser votre mot de passe</h1>
+
+                        {{ form_start(resetForm) }}
+                        <div class="mb-3">
+                            {{ form_label(resetForm.plainPassword.first, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(resetForm.plainPassword.first) }}
+                            {{ form_errors(resetForm.plainPassword.first) }}
+                        </div>
+
+                        <div class="password-strength">
+                            <div class="password-strength-meter" id="passwordStrengthMeter"></div>
+                        </div>
+                        <div class="password-strength-text mb-4" id="passwordStrengthText"></div>
+
+                        <div class="mb-3">
+                            {{ form_label(resetForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(resetForm.plainPassword.second) }}
+                            {{ form_errors(resetForm.plainPassword.second) }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn hero-btn">
+                                <i class="fas fa-lock me-2"></i> Réinitialiser le mot de passe
+                            </button>
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Retour à la connexion
+                            </a>
+                        </div>
+                        {{ form_end(resetForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-7">
+                    <a href="#" class="footer-logo">SymBook</a>
+                    <p class="footer-text">Votre destination pour découvrir, explorer et acheter des livres de tous genres. Nous sommes passionnés par la littérature et nous nous efforçons de vous offrir la meilleure expérience de lecture.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6 mb-4">
+                    <h4 class="footer-title">Liens rapides</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                        <li><a href="{{ path('app_livres_all') }}">Livres</a></li>
+                        <li><a href="{{ path('app_categories_all') }}">Catégories</a></li>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6 mb-4">
+                    <h4 class="footer-title">Catégories</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Fiction</a></li>
+                        <li><a href="#">Non-fiction</a></li>
+                        <li><a href="#">Jeunesse</a></li>
+                        <li><a href="#">Science-fiction</a></li>
+                        <li><a href="#">Biographies</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h4 class="footer-title">Contact</h4>
+                    <div class="footer-contact">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="footer-contact-text">
+                            123 Rue de la Librairie<br>
+                            75001 Paris, France
+                        </div>
+                    </div>
+                    <div class="footer-contact">
+                        <i class="fas fa-phone-alt"></i>
+                        <div class="footer-contact-text">
+                            +33 1 23 45 67 89
+                        </div>
+                    </div>
+                    <div class="footer-contact">
+                        <i class="fas fa-envelope"></i>
+                        <div class="footer-contact-text">
+                            contact@symbook.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 SymBook. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password strength meter
+            const passwordField = document.querySelector('input[type="password"]');
+            const strengthMeter = document.getElementById('passwordStrengthMeter');
+            const strengthText = document.getElementById('passwordStrengthText');
+
+            if (passwordField && strengthMeter && strengthText) {
+                passwordField.addEventListener('input', function() {
+                    const password = this.value;
+                    let strength = 0;
+                    let status = '';
+
+                    if (password.length >= 8) strength += 1;
+                    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+                    if (password.match(/\d/)) strength += 1;
+                    if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+
+                    strengthMeter.className = 'password-strength-meter';
+
+                    switch (strength) {
+                        case 0:
+                            strengthMeter.classList.add('strength-weak');
+                            status = 'Faible';
+                            strengthText.style.color = '#e74c3c';
+                            break;
+                        case 1:
+                            strengthMeter.classList.add('strength-weak');
+                            status = 'Faible';
+                            strengthText.style.color = '#e74c3c';
+                            break;
+                        case 2:
+                            strengthMeter.classList.add('strength-medium');
+                            status = 'Moyen';
+                            strengthText.style.color = '#f39c12';
+                            break;
+                        case 3:
+                            strengthMeter.classList.add('strength-good');
+                            status = 'Bon';
+                            strengthText.style.color = '#3498db';
+                            break;
+                        case 4:
+                            strengthMeter.classList.add('strength-strong');
+                            status = 'Fort';
+                            strengthText.style.color = '#00b894';
+                            break;
+                    }
+
+                    strengthText.textContent = status;
+                });
+            }
+        });
+    </script>
+{% endblock %}

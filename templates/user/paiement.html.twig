@@ -1,0 +1,245 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Paiement de la commande{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title">Paiement de la commande</h1>
+            <p class="hero-subtitle">Finalisez votre paiement pour valider votre commande.</p>
+        </div>
+        <div class="hero-shape"></div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="user-content">
+                        <h2 class="user-content-title">Informations de paiement</h2>
+
+                        <form action="{{ path('app_commande_finaliser', {'id': commande.id}) }}" method="POST" id="payment-form">
+                            <div class="payment-methods">
+                                <div class="payment-method {% if not paymentMethod or paymentMethod == 'card' %}active{% endif %}">
+                                    <input type="radio" name="paymentMethod" id="card" value="card" class="payment-method-radio" {% if not paymentMethod or paymentMethod == 'card' %}checked{% endif %}>
+                                    <div class="payment-method-icon">
+                                        <i class="far fa-credit-card"></i>
+                                    </div>
+                                    <div class="payment-method-details">
+                                        <h4 class="payment-method-title">Carte bancaire</h4>
+                                        <p class="payment-method-description">Paiement sécurisé par carte bancaire (Visa, Mastercard, etc.)</p>
+                                    </div>
+                                </div>
+
+                                <div class="payment-method {% if paymentMethod == 'cashOnDelivery' %}active{% endif %}">
+                                    <input type="radio" name="paymentMethod" id="cashOnDelivery" value="cashOnDelivery" class="payment-method-radio" {% if paymentMethod == 'cashOnDelivery' %}checked{% endif %}>
+                                    <div class="payment-method-icon">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div class="payment-method-details">
+                                        <h4 class="payment-method-title">Paiement à la livraison</h4>
+                                        <p class="payment-method-description">Payez en espèces à la réception de votre commande</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="cardPaymentForm" class="mt-4" {% if paymentMethod == 'cashOnDelivery' %}style="display: none;"{% endif %}>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="cardNumber">Numéro de carte</label>
+                                        <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="1234 5678 9012 3456">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="cardExpiry">Date d'expiration</label>
+                                        <input type="text" id="cardExpiry" name="cardExpiry" class="form-control" placeholder="MM/AA">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cardCvc">Code de sécurité (CVC)</label>
+                                        <input type="text" id="cardCvc" name="cardCvc" class="form-control" placeholder="123">
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <label for="cardName">Nom sur la carte</label>
+                                        <input type="text" id="cardName" name="cardName" class="form-control" placeholder="John Doe">
+                                    </div>
+                                </div>
+
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="saveCard" name="saveCard">
+                                    <label class="form-check-label" for="saveCard">
+                                        Sauvegarder cette carte pour mes prochains achats
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn hero-btn w-100 mt-4">
+                                {% if paymentMethod == 'cashOnDelivery' %}
+                                    Confirmer la commande
+                                {% else %}
+                                    Payer {{ commande.montantTotal|number_format(2, ',', ' ') }} DT
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="user-content">
+                        <h2 class="user-content-title">Résumé de la commande</h2>
+
+                        <div class="cart-summary">
+                            {% for item in commande.commandeLivres %}
+                                <div class="cart-summary-row">
+                                    <span class="cart-summary-label">{{ item.livre.titre }} x{{ item.quantite }}</span>
+                                    <span class="cart-summary-value">{{ (item.price * item.quantite)|number_format(2, ',', ' ') }} DT</span>
+                                </div>
+                            {% endfor %}
+
+                            <hr>
+
+                            <div class="cart-summary-row">
+                                <span class="cart-summary-label">Sous-total</span>
+                                <span class="cart-summary-value">{{ commande.sousTotal|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="cart-summary-row">
+                                <span class="cart-summary-label">Frais de livraison</span>
+                                <span class="cart-summary-value">{{ commande.fraisLivraison|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="cart-summary-row">
+                                <span class="cart-summary-label">TVA (20%)</span>
+                                <span class="cart-summary-value">{{ commande.tva|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="cart-summary-row cart-summary-total">
+                                <span class="cart-summary-label">Total</span>
+                                <span class="cart-summary-value">{{ commande.montantTotal|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+
+                            <div class="mt-4">
+                                <h5>Informations de livraison</h5>
+                                <p>{{ commande.prenom }} {{ commande.nom }}</p>
+                                <p>{{ commande.adresse }}</p>
+                                <p>{{ commande.codePostal }} {{ commande.ville }}</p>
+                                <p>{{ commande.email }}</p>
+                                <p>Gouvernorat: {{ commande.gouvernorat }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/payment-process.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des méthodes de paiement
+            const paymentMethods = document.querySelectorAll('.payment-method-radio');
+            const cardPaymentForm = document.getElementById('cardPaymentForm');
+            const submitButton = document.querySelector('button[type="submit"]');
+            const totalAmount = "{{ commande.montantTotal|number_format(2, ',', ' ') }} DT";
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function() {
+                    // Mettre à jour l'apparence des méthodes de paiement
+                    document.querySelectorAll('.payment-method').forEach(pm => {
+                        pm.classList.remove('active');
+                    });
+                    this.closest('.payment-method').classList.add('active');
+
+                    // Afficher/masquer le formulaire de carte selon la méthode choisie
+                    if (this.value === 'card') {
+                        cardPaymentForm.style.display = 'block';
+                        submitButton.textContent = 'Payer ' + totalAmount;
+                    } else {
+                        cardPaymentForm.style.display = 'none';
+                        submitButton.textContent = 'Confirmer la commande';
+                    }
+                });
+            });
+
+            // Formatage du numéro de carte
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    let formattedValue = '';
+
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) {
+                            formattedValue += ' ';
+                        }
+                        formattedValue += value[i];
+                    }
+
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // Formatage de la date d'expiration
+            const cardExpiryInput = document.getElementById('cardExpiry');
+            if (cardExpiryInput) {
+                cardExpiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+
+                    if (value.length > 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+
+                    e.target.value = value;
+                });
+            }
+
+            // Validation du formulaire
+            const paymentForm = document.getElementById('payment-form');
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', function(e) {
+                    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+                    // Si paiement par carte, valider les champs de carte
+                    if (selectedPaymentMethod === 'card') {
+                        const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+                        const cardExpiry = document.getElementById('cardExpiry').value;
+                        const cardCvc = document.getElementById('cardCvc').value;
+                        const cardName = document.getElementById('cardName').value;
+
+                        let isValid = true;
+                        let errorMessage = '';
+
+                        if (cardNumber.length < 16) {
+                            isValid = false;
+                            errorMessage += 'Le numéro de carte doit contenir 16 chiffres.\n';
+                        }
+
+                        if (!cardExpiry.match(/^\d{2}\/\d{2}$/)) {
+                            isValid = false;
+                            errorMessage += 'La date d\'expiration doit être au format MM/AA.\n';
+                        }
+
+                        if (cardCvc.length < 3) {
+                            isValid = false;
+                            errorMessage += 'Le code de sécurité doit contenir 3 chiffres.\n';
+                        }
+
+                        if (cardName.trim() === '') {
+                            isValid = false;
+                            errorMessage += 'Veuillez entrer le nom sur la carte.\n';
+                        }
+
+                        if (!isValid) {
+                            e.preventDefault();
+                            alert('Veuillez corriger les erreurs suivantes:\n' + errorMessage);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Confirmation de commande{% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="user-content">
+                <div class="order-confirmation">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h1 class="confirmation-title">Commande confirmée !</h1>
+                    <p class="confirmation-message">
+                        Merci pour votre commande.
+                        {% if commande.methodePaiement == 'card' %}
+                            Votre paiement a été traité avec succès et votre commande est en cours de préparation.
+                        {% else %}
+                            Votre commande est en cours de préparation et sera livrée dans les plus brefs délais. Le paiement se fera à la livraison.
+                        {% endif %}
+                        Un email de confirmation a été envoyé à l'adresse {{ commande.email }}.
+                    </p>
+
+                    <div class="confirmation-details">
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Numéro de commande</span>
+                            <span class="confirmation-value">{{ commande.reference }}</span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Date</span>
+                            <span class="confirmation-value">{{ commande.date|date('d/m/Y H:i') }}</span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Méthode de paiement</span>
+                            <span class="confirmation-value">
+                            {% if commande.methodePaiement == 'card' %}
+                                Carte bancaire
+                            {% elseif commande.methodePaiement == 'cashOnDelivery' %}
+                                Paiement à la livraison
+                            {% else %}
+                                {{ commande.methodePaiement }}
+                            {% endif %}
+                        </span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Statut</span>
+                            <span class="confirmation-value">{{ commande.statut }}</span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Total</span>
+                            <span class="confirmation-value">{{ commande.montantTotal|number_format(2, ',', ' ') }} DT</span>
+                        </div>
+                        {% if commande.gouvernorat %}
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Livraison</span>
+                                <span class="confirmation-value">{{ commande.gouvernorat }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{{ path('app_commande_details', {'id': commande.id}) }}" class="btn hero-btn">Voir les détails de la commande</a>
+                        <a href="{{ path('app_commande_pdf', {'id': commande.id}) }}" class="btn btn-outline-secondary ms-3">
+                            <i class="fas fa-file-pdf me-2"></i>Télécharger le PDF
+                        </a>
+                        <a href="{{ path('app_commande_historique') }}" class="btn btn-outline-secondary ms-3">Voir toutes mes commandes</a>
+                        <a href="{{ path('app_livres_all') }}" class="btn btn-outline-secondary ms-3">Continuer mes achats</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .confirmation-page .navbar {
+            background-color: var(--primary) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .confirmation-page .navbar-brand,
+        .confirmation-page .nav-link {
+            color: white !important;
+        }
+
+        .confirmation-page .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        /* Styles pour la page de confirmation */
+        .order-confirmation {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .confirmation-icon {
+            font-size: 5rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .confirmation-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .confirmation-message {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .confirmation-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .confirmation-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .confirmation-detail:last-child {
+            border-bottom: none;
+        }
+
+        .confirmation-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .confirmation-value {
+            color: #333;
+        }
+
+    </style>
+{% endblock %}

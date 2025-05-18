@@ -1,8 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CategoriesController!{% endblock %}
+{% block title %}SymBook - Ajouter une catégorie{% endblock %}
 
 {% block body %}
-    <h1>Ajout d'une nouvelle Categorie</h1>
-    {{ form(form) }}
+    <section class="hero-section">
+        <div class="container">
+            <h1>Ajouter une catégorie</h1>
+            <p>Remplissez le formulaire pour ajouter une nouvelle catégorie.</p>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            {% for flash in app.flashes('success') %}
+                <div class="alert alert-success">{{ flash }}</div>
+            {% endfor %}
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.libelle) }}
+                        {{ form_widget(form.libelle, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.libelle) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.image) }}
+                        {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.image) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Ajouter</button>
+                    {{ form_end(form) }}
+                    <a href="{{ path('app_categories_all') }}" class="btn btn-outline-primary mt-3"><i class="fas fa-arrow-left me-2"></i>Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

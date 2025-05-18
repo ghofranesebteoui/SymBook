@@ -1,16 +1,55 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CategoriesController!{% endblock %}
+{% block title %}SymBook - Gestion des catégories{% endblock %}
 
 {% block body %}
-    <h1>Liste des Categories</h1>
-    <div class="d-flex justify-content-end">
-    <a href="create.html.twig" class="btn btn-primary">Ajouter une categorie</a>
-    </div>
-    <ul>
-        {% for cat in categories %}
-            <li>{{ cat.libelle }}</li>
+    <section class="hero-section">
+        <div class="container">
+            <h1>Gestion des catégories</h1>
+            <p>Administrez les catégories de livres.</p>
+        </div>
+    </section>
 
-        {% endfor %}
-    </ul>
+    <section class="py-5">
+        <div class="container">
+            <div class="mb-4">
+                <a href="{{ path('app_categories_create') }}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Ajouter une catégorie</a>
+            </div>
+            {% for flash in app.flashes('success') %}
+                <div class="alert alert-success">{{ flash }}</div>
+            {% endfor %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for categorie in categories %}
+                        <tr>
+                            <td>{{ categorie.libelle|default('Nom indisponible') }}</td>
+                            <td>
+                                <a href="{{ path('app_categories_update', {'id': categorie.id}) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                <a href="{{ path('app_categories_delete', {'id': categorie.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>Aucune catégorie trouvée.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-container mt-5">
+                {{ knp_pagination_render(categories) }}
+            </div>
+        </div>
+    </section>
 {% endblock %}

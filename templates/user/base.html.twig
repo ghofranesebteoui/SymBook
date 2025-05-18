@@ -1,0 +1,707 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles spécifiques pour l'interface utilisateur */
+        .user-dashboard {
+            padding: 30px 0;
+            background-color: #f8f9fa;
+        }
+
+        .user-sidebar {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+
+        .user-sidebar .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .user-email {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .user-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .user-menu li {
+            margin-bottom: 10px;
+        }
+
+        .user-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu a:hover, .user-menu a.active {
+            background-color: rgba(255, 51, 102, 0.1);
+            color: var(--primary);
+        }
+
+        .user-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Styles pour le panier */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-img {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .cart-item-author {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-quantity {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .cart-quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cart-quantity-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .cart-quantity-input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+
+        .cart-remove-btn {
+            color: #dc3545;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cart-remove-btn:hover {
+            color: #bd2130;
+        }
+
+        .cart-summary {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .cart-summary-label {
+            font-weight: 600;
+        }
+
+        .cart-summary-value {
+            font-weight: 700;
+        }
+
+        .cart-summary-total {
+            font-size: 1.2rem;
+            color: var(--primary);
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        /* Styles pour le checkout */
+        .checkout-form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .checkout-form .form-control {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .payment-methods {
+            margin: 20px 0;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover, .payment-method.active {
+            border-color: var(--primary);
+            background-color: rgba(255, 51, 102, 0.05);
+        }
+
+        .payment-method-radio {
+            margin-right: 15px;
+        }
+
+        .payment-method-icon {
+            margin-right: 15px;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .payment-method-details {
+            flex: 1;
+        }
+
+        .payment-method-title {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .payment-method-description {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Styles pour l'historique des commandes */
+        .order-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .order-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-number {
+            font-weight: 700;
+        }
+
+        .order-date {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .order-statut {
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .order-statut-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .order-statut-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .order-statut-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .order-statut-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-body {
+            padding: 20px;
+        }
+
+        .order-items {
+            margin-bottom: 20px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-img {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .order-item-details {
+            flex: 1;
+        }
+
+        .order-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .order-item-author {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .order-item-price {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .order-total {
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .order-action-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 10px;
+            text-decoration: none;
+        }
+
+        .order-action-btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .order-action-btn-secondary {
+            background-color: #f8f9fa;
+            color: var(--dark);
+            border: 1px solid #ddd;
+        }
+
+        /* Profil utilisateur */
+        .profile-menu {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .profile-menu-item:hover, .profile-menu-item.active {
+            background-color: rgba(255, 51, 102, 0.1);
+            color: var(--primary);
+        }
+
+        .profile-menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-form .form-control {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .profile-form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Système d'évaluation */
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+            position: relative;
+            font-size: 30px;
+        }
+
+        .rating label:before {
+            content: '\2605';
+            position: absolute;
+            color: #ccc;
+        }
+
+        .rating input:checked ~ label:before,
+        .rating label:hover ~ label:before,
+        .rating label:hover:before {
+            color: #ffcc00;
+        }
+
+        /* Filtres de commandes */
+        .order-filters {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <form action="{{ path('app_livres_all') }}" method="GET" class="search-form">
+                <input type="text" name="search" id="searchInput" placeholder="Rechercher un livre par titre..." autocomplete="off">
+                <button type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+            <button class="close-search" id="closeSearch">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Navbar utilisateur -->
+    <!-- Navbar utilisateur -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_home') }}">SymBook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_home') }}"><i class="fas fa-home me-1"></i> Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_livres_all') }}"><i class="fas fa-book me-1"></i> Livres</a>
+                    </li>
+
+                    {% if is_granted('ROLE_USER') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i> Mon compte
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ path('app_user_profile') }}"><i class="fas fa-user-circle me-2"></i>Mon profil</a></li>
+                                <li><a class="dropdown-item" href="{{ path('app_commande_historique') }}"><i class="fas fa-history me-2"></i>Mes commandes</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_panier') }}">
+                            <i class="fas fa-shopping-cart me-1"></i> Panier
+                            <span class="badge bg-primary rounded-pill">{{ app.session.get('panier')|length|default(0) }}</span>
+                        </a>
+                    </li>
+
+                    {% if is_granted('ROLE_USER') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Déconnexion</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_login') }}"><i class="fas fa-sign-in-alt me-1"></i> Connexion</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="searchIcon"><i class="fas fa-search me-1"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-5">
+                    <a href="#" class="footer-logo">SymBook</a>
+                    <p class="footer-text">Votre destination pour découvrir, explorer et acheter des livres de tous genres. Nous sommes passionnés par la littérature et nous nous efforçons de vous offrir la meilleure expérience de lecture.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6 mb-4">
+                    <h4 class="footer-title">Liens rapides</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                        <li><a href="{{ path('app_livres_all') }}">Livres</a></li>
+                        <li><a href="{{ path('app_categories_all') }}">Catégories</a></li>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6 mb-4">
+                    <h4 class="footer-title">Catégories</h4>
+                    <ul class="footer-links">
+                        {% for categorie in categories|default([]) %}
+                            <li><a href="{{ path('app_livres_all', {'categorie': categorie.id}) }}">{{ categorie.libelle }}</a></li>
+                        {% else %}
+                            <li><a href="#">Fiction</a></li>
+                            <li><a href="#">Non-fiction</a></li>
+                            <li><a href="#">Jeunesse</a></li>
+                            <li><a href="#">Science-fiction</a></li>
+                            <li><a href="#">Biographies</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h4 class="footer-title">Contact</h4>
+                    <div class="footer-contact">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="footer-contact-text">
+                            123 Rue de la Librairie<br>
+                            75001 Paris, France
+                        </div>
+                    </div>
+                    <div class="footer-contact">
+                        <i class="fas fa-phone-alt"></i>
+                        <div class="footer-contact-text">
+                            +33 1 23 45 67 89
+                        </div>
+                    </div>
+                    <div class="footer-contact">
+                        <i class="fas fa-envelope"></i>
+                        <div class="footer-contact-text">
+                            contact@symbook.com
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 SymBook. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navbar scroll effect
+            const navbar = document.querySelector('.navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Search functionality
+            const searchIcon = document.getElementById('searchIcon');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const closeSearch = document.getElementById('closeSearch');
+
+            if (searchIcon && searchOverlay && closeSearch) {
+                searchIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    searchOverlay.classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('searchInput').focus();
+                    }, 500);
+                });
+
+                closeSearch.addEventListener('click', function() {
+                    searchOverlay.classList.remove('active');
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+                        searchOverlay.classList.remove('active');
+                    }
+                });
+            }
+
+            // Gestion des quantités dans le panier
+            const quantityBtns = document.querySelectorAll('.cart-quantity-btn');
+            if (quantityBtns.length > 0) {
+                quantityBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const input = this.parentElement.querySelector('.cart-quantity-input');
+                        const currentValue = parseInt(input.value);
+
+                        if (this.classList.contains('cart-quantity-decrease')) {
+                            if (currentValue > 1) {
+                                input.value = currentValue - 1;
+                            }
+                        } else {
+                            input.value = currentValue + 1;
+                        }
+
+                        // Soumettre le formulaire pour mettre à jour la quantité
+                        this.closest('form').submit();
+                    });
+                });
+            }
+
+            // Sélection de méthode de paiement
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            if (paymentMethods.length > 0) {
+                paymentMethods.forEach(method => {
+                    method.addEventListener('click', function() {
+                        // Désélectionner tous les autres
+                        paymentMethods.forEach(m => m.classList.remove('active'));
+
+                        // Sélectionner celui-ci
+                        this.classList.add('active');
+
+                        // Cocher le radio button
+                        const radio = this.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

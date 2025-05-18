@@ -1,0 +1,52 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Confirmation de commande{% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="user-content">
+                <div class="order-confirmation">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h1 class="confirmation-title">Commande confirmée !</h1>
+                    <p class="confirmation-message">
+                        Merci pour votre commande. Votre paiement a été traité avec succès et votre commande est en cours de préparation.
+                        Un email de confirmation a été envoyé à l'adresse {{ app.user.email }}.
+                    </p>
+
+                    <div class="confirmation-details">
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Numéro de commande</span>
+                            <span class="confirmation-value">#{{ commande.id }}</span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Date</span>
+                            <span class="confirmation-value">{{ commande.date|date('d/m/Y H:i') }}</span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Statut</span>
+                            <span class="confirmation-value">{{ commande.status }}</span>
+                        </div>
+                        <div class="confirmation-detail">
+                            <span class="confirmation-label">Total</span>
+                            <span class="confirmation-value">
+                                {% set total = 0 %}
+                                {% for item in commande.commandeLivres %}
+                                    {% set total = total + (item.price * item.quantite) %}
+                                {% endfor %}
+                                {{ (total + 4.99 + (total * 0.2))|number_format(2, ',', ' ') }} 
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{{ path('app_commande_details', {'id': commande.id}) }}" class="btn hero-btn">Voir les détails de la commande</a>
+                        <a href="{{ path('app_livres_all') }}" class="btn btn-outline-secondary ms-3">Continuer mes achats</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,49 +1,79 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
-{% block title %}Hello LivresController!{% endblock %}
+{% block title %}SymBook - Gestion des livres{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1 class="mb-4">Liste des livres</h1>
-    <table class="table table-striped">
-        <thead class="thead-dark">
-        <tr>
-            <th>Image</th>
-            <th>Titre</th>
-            <th>Editeur</th>
-            <th>Date Edition</th>
-            <th>Prix</th>
-            <th>Categorie</th>
-            <th>Action</th>
-            <th>Action</th>
-            <th>Ajout prix</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for livre in livres %}
-            <tr>
-                <td><img src="{{ livre.image }}" alt="Image du livre" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                </td>
-                <td>{{ livre.titre }}</td>
-                <td>{{ livre.editeur }}</td>
-                <td>{{ livre.dateEdition|date('d/m/Y')  }}</td>
-                <td>{{ livre.prix }}DT</td>
-                {% if livre.categorie %}
-                    <td>{{ livre.categorie.libelle }}</td>
-                {% else %}
-                    <td>Pas de catégorie</td>
-                {% endif %}
-
-                <td><a href="{{ path('app_livres_show', {'id': livre.id}) }}">Voir détail</a></td>
-                <td><a href="{{ path('app_livres_delete', {'id': livre.id}) }}">Supprimer</a></td>
-                <td><a href="{{ path('app_livres_update', {'id': livre.id}) }}">Augmenter prix</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <div class="navigation">
-        {{ knp_pagination_render(livres) }}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Gestion des livres</h1>
+        <a href="{{ path('app_livres_create') }}" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Ajouter un livre
+        </a>
     </div>
-</div>
 
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des livres</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Options:</div>
+                    <a class="dropdown-item" href="{{ path('app_livres_create') }}">Ajouter un livre</a>
+                    <a class="dropdown-item" href="#">Exporter en CSV</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Voir les livres archivés</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <form action="{{ path('app_livres_all') }}" method="GET" class="d-flex">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Rechercher un livre par titre..." value="{{ search|default('') }}">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Editeur</th>
+                        <th>Prix</th>
+                        <th>Catégorie</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for livre in livres %}
+                        <tr>
+                            <td>{{ livre.titre|default('Titre indisponible') }}</td>
+                            <td>{{ livre.editeur|default('Auteur inconnu') }}</td>
+                            <td>{{ livre.prix|default('0.00')|number_format(2, ',', ' ') }} DT</td>
+                            <td>{{ livre.categorie.libelle|default('Sans catégorie') }}</td>
+                            <td>
+                                <a href="{{ path('app_livres_show', {'id': livre.id}) }}" class="btn btn-sm btn-primary" title="Voir"><i class="fas fa-eye"></i></a>
+                                <a href="{{ path('app_livres_update', {'id': livre.id}) }}" class="btn btn-sm btn-warning" title="Modifier"><i class="fas fa-edit"></i></a>
+                                <a href="{{ path('app_livres_delete', {'id': livre.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?');" title="Supprimer"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>Aucun livre trouvé.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-4">
+                {{ knp_pagination_render(livres) }}
+            </div>
+        </div>
+    </div>
 {% endblock %}

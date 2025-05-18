@@ -1,0 +1,381 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Détails de la commande{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title">Détails de la commande</h1>
+            <p class="hero-subtitle">Commande #{{ commande.reference|default(commande.id) }}</p>
+        </div>
+        <div class="hero-shape"></div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="user-content">
+                <div class="mb-4">
+                    <a href="{{ path('app_commande_historique') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Retour à l'historique
+                    </a>
+                </div>
+
+                <div class="order-detail-card">
+                    <div class="order-detail-header">
+                        <div>
+                            <h2 class="order-detail-title">Commande #{{ commande.reference|default(commande.id) }}</h2>
+                            <p class="order-detail-date">Passée le {{ commande.date|date('d/m/Y à H:i') }}</p>
+                        </div>
+                        <div>
+                            {% if commande.statut == 'En attente de paiement' %}
+                                <span class="order-statut order-statut-pending">{{ commande.statut }}</span>
+                            {% elseif commande.statut == 'En cours de traitement' %}
+                                <span class="order-statut order-statut-processing">{{ commande.statut }}</span>
+                            {% elseif commande.statut == 'Payée' or commande.statut == 'Livrée' %}
+                                <span class="order-statut order-statut-completed">{{ commande.statut }}</span>
+                            {% elseif commande.statut == 'Annulée' %}
+                                <span class="order-statut order-statut-cancelled">{{ commande.statut }}</span>
+                            {% else %}
+                                <span class="order-statut">{{ commande.statut }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="order-detail-section">
+                        <h3 class="order-detail-section-title">Informations de livraison</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nom :</strong> {{ commande.nom }} {{ commande.prenom }}</p>
+                                <p><strong>Email :</strong> {{ commande.email }}</p>
+                                <p><strong>Téléphone :</strong> {{ commande.telephone }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Adresse :</strong> {{ commande.adresse }}</p>
+                                <p><strong>Code postal :</strong> {{ commande.codePostal }}</p>
+                                <p><strong>Ville :</strong> {{ commande.ville }}</p>
+                                <p><strong>Gouvernorat :</strong> {{ commande.gouvernorat }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-detail-section">
+                        <h3 class="order-detail-section-title">Méthode de paiement</h3>
+                        <p>
+                            {% if commande.methodePaiement == 'card' %}
+                                Carte bancaire
+                            {% elseif commande.methodePaiement == 'cashOnDelivery' %}
+                                Paiement à la livraison
+                            {% else %}
+                                {{ commande.methodePaiement }}
+                            {% endif %}
+                        </p>
+                        {% if commande.datePaiement %}
+                            <p><strong>Date de paiement :</strong> {{ commande.datePaiement|date('d/m/Y à H:i') }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="order-detail-section">
+                        <h3 class="order-detail-section-title">Articles commandés</h3>
+                        <div class="order-detail-items">
+                            {% for item in commande.commandeLivres %}
+                                <div class="order-detail-item">
+                                    <div class="order-detail-item-img">
+                                        <img src="{{ item.livre.image|default('https://m.media-amazon.com/images/I/51aWTLR3E0L._SX331_BO1,204,203,200_.jpg') }}" alt="{{ item.livre.titre }}">
+                                    </div>
+                                    <div class="order-detail-item-info">
+                                        <h4 class="order-detail-item-title">{{ item.livre.titre }}</h4>
+                                        <p class="order-detail-item-author">{{ item.livre.editeur }}</p>
+                                        <p class="order-detail-item-price">{{ item.price|number_format(2, ',', ' ') }} DT</p>
+                                    </div>
+                                    <div class="order-detail-item-quantity">
+                                        <span>Quantité: {{ item.quantite }}</span>
+                                    </div>
+                                    <div class="order-detail-item-total">
+                                        {{ (item.price * item.quantite)|number_format(2, ',', ' ') }} DT
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="order-detail-section">
+                        <h3 class="order-detail-section-title">Récapitulatif</h3>
+                        <div class="order-detail-summary">
+                            {% set sousTotal = 0 %}
+                            {% for item in commande.commandeLivres %}
+                                {% set sousTotal = sousTotal + (item.price * item.quantite) %}
+                            {% endfor %}
+
+                            <div class="order-detail-summary-row">
+                                <span>Sous-total</span>
+                                <span>{{ sousTotal|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="order-detail-summary-row">
+                                <span>TVA (20%)</span>
+                                <span>{{ (sousTotal * 0.2)|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="order-detail-summary-row">
+                                <span>Frais de livraison</span>
+                                <span>4,99 DT</span>
+                            </div>
+                            <div class="order-detail-summary-row order-detail-summary-total">
+                                <span>Total</span>
+                                <span>{{ (sousTotal + (sousTotal * 0.2) + 4.99)|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-detail-actions">
+                        {% if commande.statut == 'En attente de paiement' %}
+                            <a href="{{ path('app_commande_paiement', {'id': commande.id}) }}" class="btn hero-btn">
+                                <i class="fas fa-credit-card me-2"></i> Procéder au paiement
+                            </a>
+                            <a href="{{ path('app_commande_annuler', {'id': commande.id}) }}" class="btn btn-outline-danger ms-2">
+                                <i class="fas fa-times me-2"></i> Annuler la commande
+                            </a>
+                        {% endif %}
+
+                        {% if commande.statut == 'Payée' or commande.statut == 'Livrée' %}
+                            <a href="{{ path('app_commande_pdf', {'id': commande.id}) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-file-pdf me-2"></i> Télécharger la facture
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                <i class="fas fa-star me-2"></i> Évaluer la commande
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if commande.statut == 'Payée' or commande.statut == 'Livrée' %}
+        <!-- Modal d'évaluation -->
+        <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reviewModalLabel">Évaluer votre commande</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ path('app_commande_review', {'id': commande.id}) }}" method="POST">
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Note</label>
+                                <div class="rating">
+                                    <input type="radio" id="star5" name="rating" value="5" /><label for="star5"></label>
+                                    <input type="radio" id="star4" name="rating" value="4" /><label for="star4"></label>
+                                    <input type="radio" id="star3" name="rating" value="3" /><label for="star3"></label>
+                                    <input type="radio" id="star2" name="rating" value="2" /><label for="star2"></label>
+                                    <input type="radio" id="star1" name="rating" value="1" /><label for="star1"></label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Commentaire</label>
+                                <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn hero-btn">Soumettre l'évaluation</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles pour le système d'évaluation */
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+            position: relative;
+            font-size: 30px;
+        }
+
+        .rating label:before {
+            content: '\2605';
+            position: absolute;
+            color: #ccc;
+        }
+
+        .rating input:checked ~ label:before,
+        .rating label:hover ~ label:before,
+        .rating label:hover:before {
+            color: #ffcc00;
+        }
+
+        /* Styles pour la page de détails */
+        .order-detail-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .order-detail-header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-detail-title {
+            margin: 0 0 5px;
+            font-size: 1.5rem;
+        }
+
+        .order-detail-date {
+            margin: 0;
+            color: #777;
+        }
+
+        .order-detail-section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .order-detail-section-title {
+            margin: 0 0 15px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .order-detail-items {
+            margin-top: 15px;
+        }
+
+        .order-detail-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-detail-item-img {
+            width: 80px;
+            margin-right: 15px;
+        }
+
+        .order-detail-item-img img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .order-detail-item-info {
+            flex: 1;
+        }
+
+        .order-detail-item-title {
+            margin: 0 0 5px;
+            font-size: 1rem;
+        }
+
+        .order-detail-item-author {
+            margin: 0 0 5px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .order-detail-item-price {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .order-detail-item-quantity {
+            margin: 0 20px;
+            color: #555;
+        }
+
+        .order-detail-item-total {
+            font-weight: 600;
+            font-size: 1.1rem;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .order-detail-summary {
+            margin-top: 15px;
+        }
+
+        .order-detail-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-detail-summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-detail-summary-total {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .order-detail-actions {
+            padding: 20px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Styles pour les statuts */
+        .order-statut {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .order-statut-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .order-statut-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .order-statut-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .order-statut-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+{% endblock %}

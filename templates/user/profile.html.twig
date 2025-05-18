@@ -1,0 +1,208 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Mon profil{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title">Mon profil</h1>
+            <p class="hero-subtitle">Gérez vos informations personnelles et préférences.</p>
+        </div>
+        <div class="hero-shape"></div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="user-content">
+                        <div class="text-center mb-4">
+                            <div class="user-avatar mx-auto mb-3" style="width: 120px; height: 120px; font-size: 48px;">
+                                {% if app.user.prenom|default and app.user.nom|default %}
+                                    {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                                {% else %}
+                                    <i class="fas fa-user"></i>
+                                {% endif %}
+                            </div>
+                            <h3 class="mb-1">{{ app.user.prenom|default('') }} {{ app.user.nom|default('') }}</h3>
+                            <p class="text-muted">{{ app.user.email }}</p>
+                            <p class="text-muted">Membre depuis {{ app.user.createdAt|default('now')|date('d/m/Y') }}</p>
+                        </div>
+
+                        <div class="profile-menu">
+                            <a href="#personal-info" class="profile-menu-item active">
+                                <i class="fas fa-user me-2"></i> Informations personnelles
+                            </a>
+                            <a href="#address" class="profile-menu-item">
+                                <i class="fas fa-map-marker-alt me-2"></i> Adresse de livraison
+                            </a>
+                            <a href="#security" class="profile-menu-item">
+                                <i class="fas fa-lock me-2"></i> Sécurité
+                            </a>
+                            <a href="{{ path('app_commande_historique') }}" class="profile-menu-item">
+                                <i class="fas fa-history me-2"></i> Historique des commandes
+                            </a>
+                            <a href="#preferences" class="profile-menu-item">
+                                <i class="fas fa-cog me-2"></i> Préférences
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="user-content mb-4" id="personal-info">
+                        <h2 class="user-content-title">Informations personnelles</h2>
+
+                        <form action="{{ path('app_user_profile_update') }}" method="POST" class="profile-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="prenom">Prénom</label>
+                                    <input type="text" id="prenom" name="prenom" class="form-control" value="{{ app.user.prenom|default('') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="nom">Nom</label>
+                                    <input type="text" id="nom" name="nom" class="form-control" value="{{ app.user.nom|default('') }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="email">Email</label>
+                                    <input type="email" id="email" name="email" class="form-control" value="{{ app.user.email }}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="telephone">Téléphone</label>
+                                    <input type="tel" id="telephone" name="telephone" class="form-control" value="{{ app.user.telephone|default('') }}">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn hero-btn mt-4">Enregistrer les modifications</button>
+                        </form>
+                    </div>
+
+                    <div class="user-content mb-4" id="address">
+                        <h2 class="user-content-title">Adresse de livraison</h2>
+
+                        <form action="{{ path('app_user_address_update') }}" method="POST" class="profile-form">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="adresse">Adresse</label>
+                                    <input type="text" id="adresse" name="adresse" class="form-control" value="{{ app.user.adresse|default('') }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="codePostal">Code postal</label>
+                                    <input type="text" id="codePostal" name="codePostal" class="form-control" value="{{ app.user.codePostal|default('') }}">
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="ville">Ville</label>
+                                    <input type="text" id="ville" name="ville" class="form-control" value="{{ app.user.ville|default('') }}">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn hero-btn mt-4">Enregistrer l'adresse</button>
+                        </form>
+                    </div>
+
+                    <div class="user-content mb-4" id="security">
+                        <h2 class="user-content-title">Sécurité</h2>
+
+                        <form action="{{ path('app_user_password_update') }}" method="POST" class="profile-form">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="currentPassword">Mot de passe actuel</label>
+                                    <input type="password" id="currentPassword" name="currentPassword" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="newPassword">Nouveau mot de passe</label>
+                                    <input type="password" id="newPassword" name="newPassword" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="confirmPassword">Confirmer le mot de passe</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn hero-btn mt-4">Changer le mot de passe</button>
+                        </form>
+                    </div>
+
+                    <div class="user-content" id="preferences">
+                        <h2 class="user-content-title">Préférences</h2>
+
+                        <form action="{{ path('app_user_preferences_update') }}" method="POST" class="profile-form">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter" {% if app.user.newsletter|default(false) %}checked{% endif %}>
+                                <label class="form-check-label" for="newsletter">
+                                    Recevoir la newsletter
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="notifications" name="notifications" {% if app.user.notifications|default(false) %}checked{% endif %}>
+                                <label class="form-check-label" for="notifications">
+                                    Recevoir des notifications par email
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="promotions" name="promotions" {% if app.user.promotions|default(false) %}checked{% endif %}>
+                                <label class="form-check-label" for="promotions">
+                                    Recevoir des offres promotionnelles
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn hero-btn mt-4">Enregistrer les préférences</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des onglets du profil
+            const menuItems = document.querySelectorAll('.profile-menu-item');
+            const sections = document.querySelectorAll('#personal-info, #address, #security, #preferences');
+
+            menuItems.forEach(item => {
+                if (!item.getAttribute('href').startsWith('#')) return;
+
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Désactiver tous les onglets
+                    menuItems.forEach(mi => mi.classList.remove('active'));
+
+                    // Activer l'onglet cliqué
+                    this.classList.add('active');
+
+                    // Masquer toutes les sections
+                    sections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+
+                    // Afficher la section correspondante
+                    const targetId = this.getAttribute('href').substring(1);
+                    document.getElementById(targetId).style.display = 'block';
+                });
+            });
+
+            // Afficher la première section par défaut
+            sections.forEach((section, index) => {
+                if (index > 0) {
+                    section.style.display = 'none';
+                }
+            });
+        });
+    </script>
+{% endblock %}

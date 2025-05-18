@@ -1,0 +1,124 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}SymBook - Détails de la commande{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title">Détails de la commande</h1>
+            <p class="hero-subtitle">Consultez les détails de votre commande #{{ commande.id }}.</p>
+        </div>
+        <div class="hero-shape"></div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="user-content mb-4">
+                        <h2 class="user-content-title">Articles commandés</h2>
+
+                        <div class="order-items">
+                            {% for item in commande.commandeLivres %}
+                                <div class="cart-item">
+                                    <img src="{{ item.livre.image|default('https://m.media-amazon.com/images/I/51aWTLR3E0L._SX331_BO1,204,203,200_.jpg') }}" alt="{{ item.livre.titre }}" class="cart-item-img">
+                                    <div class="cart-item-details">
+                                        <h3 class="cart-item-title">{{ item.livre.titre }}</h3>
+                                        <p class="cart-item-author">{{ item.livre.editeur }}</p>
+                                        <span class="cart-item-price">{{ item.price|number_format(2, ',', ' ') }} DT</span>
+                                    </div>
+                                    <div class="cart-item-actions">
+                                        <div class="cart-quantite">
+                                            <span class="fw-bold">Quantité: {{ item.quantite }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="user-content">
+                        <h2 class="user-content-title">Informations de livraison</h2>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nom:</strong> {{ app.user.nom|default('') }} {{ app.user.prenom|default('') }}</p>
+                                <p><strong>Adresse:</strong> {{ app.user.adresse|default('') }}</p>
+                                <p><strong>Code postal:</strong> {{ app.user.codePostal|default('') }}</p>
+                                <p><strong>Ville:</strong> {{ app.user.ville|default('') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Email:</strong> {{ app.user.email }}</p>
+                                <p><strong>Téléphone:</strong> {{ app.user.telephone|default('') }}</p>
+                                <p><strong>Date de commande:</strong> {{ commande.date|date('d/m/Y H:i') }}</p>
+                                <p>
+                                    <strong>Statut:</strong>
+                                    {% if commande.status == 'En attente de paiement' %}
+                                        <span class="badge bg-warning">{{ commande.status }}</span>
+                                    {% elseif commande.status == 'En cours de traitement' %}
+                                        <span class="badge bg-primary">{{ commande.status }}</span>
+                                    {% elseif commande.status == 'Payée' or commande.status == 'Livrée' %}
+                                        <span class="badge bg-success">{{ commande.status }}</span>
+                                    {% elseif commande.status == 'Annulée' %}
+                                        <span class="badge bg-danger">{{ commande.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ commande.status }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="user-content">
+                        <h2 class="user-content-title">Résumé de la commande</h2>
+
+                        <div class="cart-summary">
+                            {% set total = 0 %}
+                            {% for item in commande.commandeLivres %}
+                                {% set itemTotal = item.price * item.quantite %}
+                                {% set total = total + itemTotal %}
+                                <div class="cart-summary-row">
+                                    <span class="cart-summary-label">{{ item.livre.titre }} x{{ item.quantite }}</span>
+                                    <span class="cart-summary-value">{{ itemTotal|number_format(2, ',', ' ') }} DT</span>
+                                </div>
+                            {% endfor %}
+
+                            <hr>
+
+                            <div class="cart-summary-row">
+                                <span class="cart-summary-label">Sous-total</span>
+                                <span class="cart-summary-value">{{ total|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="cart-summary-row">
+                                <span class="cart-summary-label">Frais de livraison</span>
+                                <span class="cart-summary-value">4,99 DT</span>
+                            </div>
+                            <div class="cart-summary-row">
+                                <span class="cart-summary-label">TVA (20%)</span>
+                                <span class="cart-summary-value">{{ (total * 0.2)|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+                            <div class="cart-summary-row cart-summary-total">
+                                <span class="cart-summary-label">Total</span>
+                                <span class="cart-summary-value">{{ (total + 4.99 + (total * 0.2))|number_format(2, ',', ' ') }} DT</span>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="{{ path('app_commande_historique') }}" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-arrow-left me-2"></i>Retour à l'historique
+                                </a>
+
+                                {% if commande.status == 'En attente de paiement' %}
+                                    <a href="{{ path('app_commande_paiement', {'id': commande.id}) }}" class="btn hero-btn w-100 mt-3">
+                                        <i class="fas fa-credit-card me-2"></i>Procéder au paiement
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
